@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { FadeImage } from "@/components/ui/fade-image";
 import { currency } from "@/lib/format";
 import { SectionPanel } from "./section-panel";
 import { Separator } from "@/components/ui/separator";
@@ -19,10 +19,11 @@ export function TopItems({ items }: { items: TopItem[] }) {
         {items.map((item) => (
           <li
             key={item.id}
-            className="flex flex-col gap-1 rounded-lg border border-border-strong bg-secondary p-1"
+            data-lift
+            className="flex flex-col gap-1 rounded-lg border border-border-strong bg-secondary p-1 transition-[background-color,border-color,translate] hover:-translate-y-px hover:border-primary/50 hover:bg-elevated active:translate-y-0"
           >
             <div className="relative aspect-square w-full overflow-hidden rounded-md bg-white">
-              <Image
+              <FadeImage
                 src={item.image}
                 alt={item.title}
                 fill

@@ -17,7 +17,7 @@ const NAV = [
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-30 h-16 border-b border-border/60 bg-background/85 backdrop-blur-md lg:h-21 lg:border-b-0 lg:backdrop-blur-none">
+    <header data-header className="sticky top-0 z-30 h-16 animate-fade-in border-b border-border/60 bg-background/85 backdrop-blur-md lg:h-21 lg:border-b-0 lg:backdrop-blur-none">
       <div className="mx-auto flex h-full max-w-[1440px] items-center px-4 lg:px-[50px]">
         <Link href={CLAW_HREF} aria-label="Beezie home" className="shrink-0">
           <Image

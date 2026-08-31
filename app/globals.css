@@ -45,6 +45,12 @@
   --animate-pull-out: pull-out 460ms var(--ease-out-quint) forwards;
   --animate-pull-flash: pull-flash 1100ms var(--ease-out-quint);
   --animate-live-ping: live-ping 700ms var(--ease-out-quint);
+  --animate-gate-out: gate-out 480ms var(--ease-out-quint) 1500ms forwards;
+  --animate-gate-out-now: gate-out 480ms var(--ease-out-quint) forwards;
+  --animate-gate-progress: gate-progress 1500ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  --animate-stage-in: stage-in 720ms var(--ease-out-quint) both;
+  --animate-stage-bloom: stage-bloom 1100ms var(--ease-out-quint) forwards;
+  --animate-rise-in: rise-in 520ms var(--ease-out-quint) both;
 }
 
 @keyframes sheet-in {
@@ -94,6 +100,31 @@
   from { transform: scale(1); opacity: 0.5; }
   to { transform: scale(2.6); opacity: 0; }
 }
+@keyframes gate-out {
+  from { opacity: 1; visibility: visible; }
+  to { opacity: 0; visibility: hidden; }
+}
+@keyframes gate-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(0.92); }
+}
+@keyframes stage-in {
+  from { opacity: 0; transform: scale(0.985); filter: blur(6px); }
+  to { opacity: 1; transform: scale(1); filter: blur(0); }
+}
+@keyframes stage-bloom {
+  0% { opacity: 0; }
+  22% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes header-settle {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
 
 @layer base {
   html {
@@ -138,6 +169,16 @@
   font-variant-numeric: tabular-nums;
 }
 
+@utility scroll-fade {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 14px,
+    #000 calc(100% - 18px),
+    transparent 100%
+  );
+}
+
 @utility pb-safe-* {
   padding-bottom: max(calc(--value(integer) * 1px), env(safe-area-inset-bottom));
 }
@@ -159,10 +200,33 @@
   );
 }
 
+@media (prefers-reduced-motion: no-preference) and (width >= 64rem) {
+  @supports (animation-timeline: scroll(root block)) {
+    [data-header] {
+      background: transparent;
+    }
+    [data-header]::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      border-bottom: 1px solid var(--color-border);
+      background: color-mix(in srgb, var(--color-background) 88%, transparent);
+      backdrop-filter: blur(12px);
+      animation-name: header-settle;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 72px;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
+    animation-delay: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

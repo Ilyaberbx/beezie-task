@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query";
 import { SiteHeader } from "@/components/claw/site-header";
 import { MachineStage } from "@/components/claw/machine-stage";
+import { PageGate } from "@/components/claw/page-gate";
 import { ClawExperience } from "@/components/claw/claw-experience";
 import { OddsGrid } from "@/components/claw/odds-grid";
 import { MoreMachines } from "@/components/claw/more-machines";
@@ -28,17 +29,20 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
+      <PageGate />
       <SiteHeader />
 
       <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 pb-28 pt-2 md:gap-6 md:px-[50px] md:pb-12 md:pt-7">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6">
-          <MachineStage
-            name={machine.name}
-            video={machine.idleVideo}
-            poster={machine.poster}
-          />
+          <div className="animate-stage-in [animation-delay:640ms]">
+            <MachineStage
+              name={machine.name}
+              video={machine.idleVideo}
+              poster={machine.poster}
+            />
+          </div>
 
-          <div className="flex flex-col gap-5 rounded-xl border border-border bg-card-gradient px-4 py-5 shadow-sm md:gap-4 md:rounded-panel md:bg-card-gradient-wide md:p-5">
+          <div className="flex animate-rise-in flex-col gap-5 rounded-xl border border-border bg-card-gradient px-4 py-5 shadow-sm [animation-delay:730ms] md:gap-4 md:rounded-panel md:bg-card-gradient-wide md:p-5">
             <div className="flex flex-col gap-4 md:gap-6">
               <div className="flex flex-col gap-1">
                 <h1 className="text-xl font-semibold leading-7 text-foreground md:text-2xl md:leading-8">
@@ -69,8 +73,12 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
         </div>
 
         <div className="grid min-h-0 gap-4 max-md:grid-rows-[596px_606px] md:grid-cols-2 md:gap-6 lg:h-[800px]">
-          <TopItems items={topItems} />
-          <RecentPulls pulls={recentPulls} />
+          <div className="flex animate-rise-in min-h-0 flex-col [animation-delay:810ms]">
+            <TopItems items={topItems} />
+          </div>
+          <div className="flex animate-rise-in min-h-0 flex-col [animation-delay:870ms]">
+            <RecentPulls pulls={recentPulls} />
+          </div>
         </div>
       </main>
     </HydrationBoundary>

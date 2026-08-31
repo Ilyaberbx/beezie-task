@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { FadeImage } from "@/components/ui/fade-image";
 import { currency } from "@/lib/format";
 import { PULL_WINDOW, useLiveRecentPulls } from "@/hooks/claw/use-live-recent-pulls";
 import { SectionPanel } from "./section-panel";
@@ -24,7 +24,7 @@ export function RecentPulls({ pulls: initial }: { pulls: RecentPull[] }) {
                 className="flex items-center gap-1 rounded-lg border border-border bg-secondary p-2 group-data-[pull=entering]:animate-pull-flash md:gap-2 md:p-2.5"
               >
                 <div className="relative size-16 shrink-0 overflow-hidden rounded-sm bg-white md:size-21">
-                  <Image
+                  <FadeImage
                     src={pull.image}
                     alt={pull.title}
                     fill

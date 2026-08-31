@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { FadeImage } from "@/components/ui/fade-image";
 import Link from "next/link";
 import { currency } from "@/lib/format";
 import type { MachineSummary } from "@/lib/claw/types";
@@ -17,7 +17,7 @@ export function MoreMachines({ machines }: { machines: MachineSummary[] }) {
               data-lift
               className="flex h-full flex-col items-center justify-center gap-1.5 rounded-lg border border-border-strong bg-secondary px-2 py-2.5 text-center transition-[background-color,border-color,translate] hover:-translate-y-px hover:border-primary/50 hover:bg-elevated active:translate-y-0 md:gap-2 md:px-4 md:py-1.5"
             >
-              <Image
+              <FadeImage
                 src={machine.icon}
                 alt=""
                 width={40}

@@ -2,6 +2,7 @@
 
 import { Sparkles, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { markStageReady } from "@/hooks/claw/use-stage-ready";
 import { useSoundPreference } from "@/hooks/claw/use-sound-preference";
 import { cn } from "@/lib/cn";
 
@@ -15,6 +16,7 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [soundOn, setSoundOn] = useSoundPreference();
   const [animationOn, setAnimationOn] = useState(true);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const element = videoRef.current;
@@ -33,21 +35,46 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
     }
   }, [animationOn]);
 
+  // A cached video can already be playable before this component mounts.
+  useEffect(() => {
+    if (videoRef.current && videoRef.current.readyState >= 3) handleReady();
+  }, []);
+
+  function handleReady() {
+    setReady(true);
+    markStageReady();
+  }
+
   return (
-    <div className="relative aspect-square w-full overflow-hidden rounded-[15px] bg-card shadow-sm md:rounded-panel">
+    <div
+      className="relative aspect-square w-full overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-sm md:rounded-panel"
+      style={{ backgroundImage: `url(${poster})` }}
+    >
       <video
         ref={videoRef}
-        className="size-full object-cover"
+        className={cn(
+          "size-full object-cover transition-opacity duration-700 ease-out",
+          ready ? "opacity-100" : "opacity-0",
+        )}
         poster={poster}
         preload="auto"
         autoPlay
         loop
         muted
         playsInline
+        onCanPlay={handleReady}
         aria-label={`${name} machine`}
       >
         <source src={video} type="video/mp4" />
       </video>
+
+      {ready && (
+        <span
+          key="bloom"
+          aria-hidden
+          className="pointer-events-none absolute inset-0 animate-stage-bloom rounded-[15px] shadow-[inset_0_0_80px_-10px_#ffca2899,inset_0_0_0_1px_#ffca2866] md:rounded-panel"
+        />
+      )}
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center gap-2 bg-gradient-to-t from-black/55 to-transparent p-3">
         <StageToggle
