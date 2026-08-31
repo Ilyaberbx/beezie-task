@@ -62,10 +62,9 @@
   --animate-stage-in: stage-in 720ms var(--ease-out-quint) both;
   --animate-stage-bloom: stage-bloom 1100ms var(--ease-out-quint) forwards;
   --animate-rise-in: rise-in 520ms var(--ease-out-quint) both;
-  --animate-check-ring: check-ring 420ms var(--ease-draw) both;
-  --animate-check-disc: check-disc 320ms var(--ease-out-quint) 340ms both;
-  --animate-check-draw: check-draw 320ms var(--ease-draw) 560ms both;
-  --animate-check-halo: check-halo 640ms var(--ease-out-quint) 640ms both;
+  --animate-tick-a: tick-a 200ms var(--ease-draw) 160ms both;
+  --animate-tick-b: tick-b 300ms var(--ease-draw) 320ms both;
+  --animate-tick-settle: tick-settle 420ms var(--ease-out-quint) 580ms both;
 }
 
 @keyframes sheet-in {
@@ -136,23 +135,19 @@
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-/* Success mark, four beats: the ring traces, the disc fills it,
-   the tick draws, one halo confirms and leaves. */
-@keyframes check-ring {
-  from { stroke-dashoffset: 164; opacity: 0.4; }
-  to { stroke-dashoffset: 0; opacity: 1; }
-}
-@keyframes check-disc {
-  from { transform: scale(0); }
-  to { transform: scale(1); }
-}
-@keyframes check-draw {
-  from { stroke-dashoffset: 32; }
+/* The tick draws itself: short leg, then long leg, then it lands. */
+@keyframes tick-a {
+  from { stroke-dashoffset: 8; }
   to { stroke-dashoffset: 0; }
 }
-@keyframes check-halo {
-  from { transform: scale(0.92); opacity: 0.55; }
-  to { transform: scale(1.9); opacity: 0; }
+@keyframes tick-b {
+  from { stroke-dashoffset: 16; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes tick-settle {
+  0% { transform: scale(1); }
+  38% { transform: scale(1.12); }
+  100% { transform: scale(1); }
 }
 @keyframes header-settle {
   from { opacity: 0; }

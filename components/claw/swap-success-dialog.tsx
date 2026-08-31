@@ -22,7 +22,9 @@ export function SwapSuccessDialog({
       panelClassName="sm:max-w-[420px]"
     >
       <div className="flex flex-col items-center gap-3 p-8 pb-safe-32 text-center">
-        {open && <SuccessMark />}
+        <span className="grid size-14 animate-dialog-in place-items-center rounded-full bg-emerald text-background">
+          {open && <TickIcon />}
+        </span>
         <h2 className="text-lg font-semibold text-white">Swap success</h2>
         <p className="text-sm text-secondary-foreground">
           {currency(result.credited)} has been credited to your wallet.
@@ -35,42 +37,26 @@ export function SwapSuccessDialog({
   );
 }
 
-function SuccessMark() {
+/** Lucide's Check, split at the elbow so each leg can draw in turn. */
+function TickIcon() {
   return (
-    <span aria-hidden className="relative grid size-14 place-items-center">
-      <span className="absolute inset-0 animate-check-halo rounded-full border border-emerald" />
-      <svg viewBox="0 0 56 56" className="size-14 overflow-visible">
-        <circle
-          cx="28"
-          cy="28"
-          r="26"
-          fill="none"
-          stroke="var(--color-emerald)"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeDasharray="164"
-          className="animate-check-ring"
-          style={{ transformOrigin: "center", transform: "rotate(-90deg)" }}
-        />
-        <circle
-          cx="28"
-          cy="28"
-          r="26"
-          fill="var(--color-emerald)"
-          className="animate-check-disc"
-          style={{ transformOrigin: "center" }}
-        />
-        <path
-          d="M17 29 24 36 39 21"
-          fill="none"
-          stroke="var(--color-background)"
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeDasharray="32"
-          className="animate-check-draw"
-        />
-      </svg>
-    </span>
+    <svg
+      viewBox="0 0 24 24"
+      className="size-8"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={3}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <g
+        className="animate-tick-settle"
+        style={{ transformBox: "fill-box", transformOrigin: "center" }}
+      >
+        <path d="M4 12 9 17" strokeDasharray="8" className="animate-tick-a" />
+        <path d="M9 17 20 6" strokeDasharray="16" className="animate-tick-b" />
+      </g>
+    </svg>
   );
 }
