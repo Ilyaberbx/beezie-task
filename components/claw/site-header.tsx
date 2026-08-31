@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/asset";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
@@ -22,7 +23,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-full max-w-[1440px] items-center px-4 lg:px-[50px]">
         <Link href="/claw/pokemon-gold" aria-label="Beezie home" className="shrink-0">
           <Image
-            src="/media/beezie-logo.svg"
+            src={asset("/media/beezie-logo.svg")}
             alt="Beezie"
             width={94}
             height={40}
@@ -30,7 +31,7 @@ export function SiteHeader() {
             className="hidden lg:block"
           />
           <Image
-            src="/media/beezie-mark.svg"
+            src={asset("/media/beezie-mark.svg")}
             alt="Beezie"
             width={22}
             height={32}
@@ -53,7 +54,7 @@ export function SiteHeader() {
                 >
                   {entry.active && (
                     <Image
-                      src="/media/icons/sparkle-claw.svg"
+                      src={asset("/media/icons/sparkle-claw.svg")}
                       alt=""
                       width={16}
                       height={16}
@@ -79,7 +80,7 @@ export function SiteHeader() {
         <div className="ml-auto flex items-center gap-6">
           <span className="hidden h-10 items-center gap-2.5 rounded-[7px] bg-card px-4 text-sm font-medium sm:flex">
             <Image
-              src="/media/icons/wallet.svg"
+              src={asset("/media/icons/wallet.svg")}
               alt=""
               width={16}
               height={13}
@@ -90,7 +91,7 @@ export function SiteHeader() {
             </span>
           </span>
           <Image
-            src="/media/avatar.webp"
+            src={asset("/media/avatar.webp")}
             alt="Your profile"
             width={40}
             height={40}

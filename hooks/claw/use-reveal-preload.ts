@@ -1,5 +1,6 @@
 "use client";
 
+import { asset } from "@/lib/asset";
 import { useEffect, useState } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 
@@ -10,7 +11,7 @@ const BUFFER_CEILING_MS = 6000;
 export function useRevealPreload() {
   const isDesktop = useMediaQuery(DESKTOP, true);
   const prefersReducedMotion = useMediaQuery(REDUCED_MOTION, false);
-  const source = isDesktop ? "/media/reveal-web.mp4" : "/media/reveal-mobile.mp4";
+  const source = isDesktop ? asset("/media/reveal-web.mp4") : asset("/media/reveal-mobile.mp4");
   const [bufferedSource, setBufferedSource] = useState<string | null>(null);
 
   useEffect(() => {

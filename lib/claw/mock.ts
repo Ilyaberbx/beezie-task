@@ -1,3 +1,4 @@
+import { asset } from "../asset.ts";
 import type {
   ClawMachine,
   Collectible,
@@ -9,7 +10,7 @@ import type {
   TopItem,
 } from "./types";
 
-const item = (path: string) => `/media/items/${path}.webp`;
+const item = (path: string) => asset(`/media/items/${path}.webp`);
 
 export const COLLECTIBLES: Collectible[] = [
   { id: "poncho-pikachu", title: "2016 Japanese Promo Poncho Wear Pikachu #231 PSA 10", image: item("poncho-wear-pikachu"), swapValue: 14200, rarity: "ultra" },
@@ -47,10 +48,10 @@ const ODDS = [
 ] as const satisfies readonly { key: RarityKey; label: string; chance: number; range: string }[];
 
 const MACHINE_DIRECTORY: MachineSummary[] = [
-  { slug: "pokemon-gold", name: "Pokémon Gold", price: 500, icon: "/media/machines/gold.webp" },
-  { slug: "tcg-gold", name: "TCG Gold", price: 250, icon: "/media/machines/box-dark.png" },
-  { slug: "tcg-silver", name: "TCG Silver", price: 50, icon: "/media/machines/box-dark.png" },
-  { slug: "wildcard", name: "Wildcard", price: 30, icon: "/media/machines/box-wildcard.png" },
+  { slug: "pokemon-gold", name: "Pokémon Gold", price: 500, icon: asset("/media/machines/gold.webp") },
+  { slug: "tcg-gold", name: "TCG Gold", price: 250, icon: asset("/media/machines/box-dark.png") },
+  { slug: "tcg-silver", name: "TCG Silver", price: 50, icon: asset("/media/machines/box-dark.png") },
+  { slug: "wildcard", name: "Wildcard", price: 30, icon: asset("/media/machines/box-wildcard.png") },
 ];
 
 const TAGLINES: Record<string, string> = {
@@ -66,8 +67,8 @@ export const MACHINES: ClawMachine[] = MACHINE_DIRECTORY.map((machine) => ({
   tagline: TAGLINES[machine.slug],
   price: machine.price,
   points: Math.round(machine.price / 2),
-  idleVideo: "/media/machine-idle.mp4",
-  poster: "/media/machine-poster.webp",
+  idleVideo: asset("/media/machine-idle.mp4"),
+  poster: asset("/media/machine-poster.webp"),
   averageValue: 505,
   odds: ODDS.map((tier) => ({ ...tier })),
   siblings: MACHINE_DIRECTORY.filter((sibling) => sibling.slug !== machine.slug),

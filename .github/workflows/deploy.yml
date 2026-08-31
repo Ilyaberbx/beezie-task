@@ -27,7 +27,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
         env:
-          PAGES_BASE_PATH: /beezie-task
+          NEXT_PUBLIC_BASE_PATH: /beezie-task
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out
