@@ -2,6 +2,7 @@
 
 import { Sparkles, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useSoundPreference } from "@/hooks/claw/use-sound-preference";
 import { cn } from "@/lib/cn";
 
 type MachineStageProps = {
@@ -12,14 +13,17 @@ type MachineStageProps = {
 
 export function MachineStage({ name, video, poster }: MachineStageProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [soundOn, setSoundOn] = useState(false);
+  const [soundOn, setSoundOn] = useSoundPreference();
   const [animationOn, setAnimationOn] = useState(true);
 
   useEffect(() => {
     const element = videoRef.current;
     if (!element) return;
     element.muted = !soundOn;
-  }, [soundOn]);
+    // Unmuting can trip the autoplay policy and pause the loop; the toggle is a
+    // user gesture, so re-starting it here is allowed.
+    if (soundOn && element.paused && animationOn) void element.play().catch(() => undefined);
+  }, [soundOn, animationOn]);
 
   useEffect(() => {
     const element = videoRef.current;
@@ -50,7 +54,7 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center gap-2 bg-gradient-to-t from-black/55 to-transparent p-3">
         <StageToggle
           active={soundOn}
-          onClick={() => setSoundOn((current) => !current)}
+          onClick={() => setSoundOn(!soundOn)}
           icon={soundOn ? <Volume2 className="size-3.5" /> : <VolumeX className="size-3.5" />}
           label={soundOn ? "Sound on" : "Sound off"}
         />
