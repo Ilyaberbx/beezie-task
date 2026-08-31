@@ -32,7 +32,6 @@
   --shadow-card: 0 8px 8px -4px #03030308, 3px 20px 24px -4px #03030314;
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-  /* Every bare transition-* inherits the curve the keyframes already use. */
   --default-transition-duration: 150ms;
   --default-transition-timing-function: var(--ease-out-quint);
   --animate-sheet-in: sheet-in 320ms var(--ease-out-quint);
@@ -130,8 +129,6 @@
     display: none;
   }
 
-  /* The scrim is hoisted out to <DialogScrim> so it can be held across a
-     whole flow; two stacked backdrops would pulse darker on every handoff. */
   dialog::backdrop {
     background: transparent;
   }
@@ -141,8 +138,10 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* The panel gradient is angled off the card's own diagonal, so it differs
-   between the 390px and 1440px frames. */
+@utility pb-safe-* {
+  padding-bottom: max(calc(--value(integer) * 1px), env(safe-area-inset-bottom));
+}
+
 @utility bg-card-gradient {
   background-image: linear-gradient(
     120.5964deg,
@@ -169,20 +168,16 @@
     transition-duration: 0.01ms !important;
   }
 
-  /* An arrival still has to read as an arrival: fade only, no movement or blur. */
   [data-pull="entering"] {
     animation: fade-in 160ms linear !important;
   }
   [data-pull="leaving"] {
     animation: fade-out 160ms linear forwards !important;
   }
-  /* The gold flash is colour, not movement, so it survives the reduction. */
   [data-pull="entering"] [data-pull-row] {
     animation: pull-flash 900ms var(--ease-out-quint) !important;
   }
 
-  /* Depth on hover reads as colour and shadow, not movement. Press feedback
-     still scales: it confirms an action rather than decorating one. */
   [data-lift]:hover {
     translate: none !important;
   }

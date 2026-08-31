@@ -1,7 +1,6 @@
 import type { RecentPull } from "./types";
 
 export type RecentPullsFeed = {
-  /** Starts delivering pulls as they happen. Returns the unsubscribe. */
   subscribe(onPull: (pull: RecentPull) => void): () => void;
 };
 
@@ -22,10 +21,8 @@ export function createMockRecentPullsFeed({
       let live = true;
 
       const schedule = () => {
-        // Jitter, not a metronome: a real feed never arrives on the beat.
         timer = setTimeout(() => {
           onPull(next());
-          // onPull may have unsubscribed us; rescheduling then would be unstoppable.
           if (live) schedule();
         }, minDelayMs + Math.random() * (maxDelayMs - minDelayMs));
       };

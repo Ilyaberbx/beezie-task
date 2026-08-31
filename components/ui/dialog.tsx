@@ -10,7 +10,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 import { cn } from "@/lib/cn";
 
 type DialogProps = {
@@ -19,20 +19,13 @@ type DialogProps = {
   label: string;
   variant?: "center" | "sheet" | "fullscreen" | "video";
   dismissible?: boolean;
+  onOpened?: () => void;
   panelClassName?: string;
   children: ReactNode;
 };
 
-// Hand-coupled to the 180ms in the --animate-*-out tokens (app/globals.css).
-// Change one, change both.
 const EXIT_MS = 180;
 
-/**
- * Every mounted Dialog registers here. Two things need the shared view: the
- * scrim, so it can be held across a whole flow instead of re-fading once per
- * dialog, and each dialog's open gate, so a handoff plays as one panel out
- * then the next one in rather than both at once.
- */
 type DialogPhase = "open" | "closing";
 
 const registry = new Map<symbol, DialogPhase>();
@@ -70,12 +63,6 @@ const getAnyOpen = () => anyOpen;
 const serverVersion = () => 0;
 const serverClosed = () => false;
 
-/**
- * The one scrim behind every dialog. Native showModal() promotes a dialog to
- * the top layer, which paints above all normal-flow content, so a plain fixed
- * element sits underneath the panels without fighting them for z-index.
- * Mounted once in the root layout.
- */
 export function DialogScrim() {
   const open = useSyncExternalStore(subscribe, getAnyOpen, serverClosed);
 
@@ -105,34 +92,32 @@ export function Dialog({
   label,
   variant = "center",
   dismissible = true,
+  onOpened,
   panelClassName,
   children,
 }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const onCloseRef = useRef(onClose);
+  const onOpenedRef = useRef(onOpened);
   const [id] = useState(() => Symbol("dialog"));
   const [closing, setClosing] = useState(false);
-  const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)", false);
+  const reduceMotion = usePrefersReducedMotion();
 
-  // Subscribed for the re-render; the registry itself is read below.
   useSyncExternalStore(subscribe, getVersion, serverVersion);
   const hasOther = hasOtherDialog(id);
 
   useEffect(() => {
     onCloseRef.current = onClose;
+    onOpenedRef.current = onOpened;
   });
 
-  // The `open` prop is the only source of truth for both directions. A stage
-  // change closes a dialog the same way a click does, so programmatic exits
-  // animate too — including on dialogs that are not dismissible.
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    // Wait for the outgoing dialog to finish leaving. Dialogs in one flow have
-    // to be mutually exclusive, or this would wait forever.
     if (open && !dialog.open && !hasOther) {
       dialog.showModal();
       dialog.focus();
+      onOpenedRef.current?.();
     }
     if (open && dialog.open && !closing) publish(id, "open");
     if (!open && dialog.open && !closing) setClosing(true);
@@ -152,8 +137,6 @@ export function Dialog({
     return () => window.clearTimeout(timer);
   }, [closing, reduceMotion, id]);
 
-  // A conditionally-rendered dialog must not leave the registry occupied, or
-  // every other dialog would wait on a panel that no longer exists.
   useEffect(() => () => publish(id, null), [id]);
 
   useEffect(() => {

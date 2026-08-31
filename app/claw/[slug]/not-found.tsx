@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DEFAULT_MACHINE_SLUG } from "@/lib/claw/mock";
 
 export default function ClawNotFound() {
   return (
@@ -10,7 +11,7 @@ export default function ClawNotFound() {
         It may have been retired or restocked under another name.
       </p>
       <Link
-        href="/claw/pokemon-gold"
+        href={`/claw/${DEFAULT_MACHINE_SLUG}`}
         className="mt-2 inline-flex h-12 items-center rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground transition-colors hover:bg-[#ffd451]"
       >
         Back to the Claw

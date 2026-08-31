@@ -1,7 +1,7 @@
 "use client";
 
 import { Volume2, VolumeX } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { useSoundPreference } from "@/hooks/claw/use-sound-preference";
 
@@ -22,22 +22,28 @@ export function RevealOverlay({
 }: RevealOverlayProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [soundOn, setSoundOn] = useSoundPreference();
+  const [openings, setOpenings] = useState(0);
 
-  // Ordered before the play effect so the first frame already carries the
-  // right mute state.
   useEffect(() => {
     const element = videoRef.current;
     if (!element) return;
     element.muted = !soundOn;
-  }, [soundOn, open]);
+  }, [soundOn, openings]);
 
   useEffect(() => {
-    if (!open) return;
+    if (open && skipAnimation) onFinish();
+  }, [open, skipAnimation, onFinish]);
 
-    if (skipAnimation) {
-      onFinish();
-      return;
-    }
+  useEffect(() => {
+    if (open) return;
+    const element = videoRef.current;
+    if (!element) return;
+    element.pause();
+    element.currentTime = 0;
+  }, [open]);
+
+  useEffect(() => {
+    if (openings === 0) return;
 
     const element = videoRef.current;
     let started = false;
@@ -46,9 +52,6 @@ export function RevealOverlay({
         started = true;
       });
 
-    // Autoplay policy blocks unmuted playback when the purchase click's user
-    // activation has lapsed. Fall back to a muted run rather than dropping the
-    // reveal entirely.
     void play()?.catch(() => {
       if (!element) return onFinish();
       element.muted = true;
@@ -60,14 +63,15 @@ export function RevealOverlay({
     }, MAX_WAIT_MS);
 
     return () => window.clearTimeout(bailout);
-  }, [open, skipAnimation, onFinish]);
+  }, [openings, onFinish]);
 
   if (skipAnimation) return null;
 
   return (
     <Dialog
       open={open}
-      onClose={onFinish}
+      onClose={() => undefined}
+      onOpened={() => setOpenings((count) => count + 1)}
       label="Revealing your pull"
       variant="video"
       dismissible={false}

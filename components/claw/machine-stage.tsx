@@ -20,8 +20,6 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
     const element = videoRef.current;
     if (!element) return;
     element.muted = !soundOn;
-    // Unmuting can trip the autoplay policy and pause the loop; the toggle is a
-    // user gesture, so re-starting it here is allowed.
     if (soundOn && element.paused && animationOn) void element.play().catch(() => undefined);
   }, [soundOn, animationOn]);
 

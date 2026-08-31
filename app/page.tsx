@@ -1,13 +1,11 @@
-"use client";
+import type { Metadata } from "next";
+import { ClawMachinePage } from "@/components/claw/claw-machine-page";
+import { DEFAULT_MACHINE_SLUG } from "@/lib/claw/mock";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+export const metadata: Metadata = {
+  alternates: { canonical: `/claw/${DEFAULT_MACHINE_SLUG}` },
+};
 
-// Client-side: a server redirect() cannot be prerendered into a static export.
 export default function Home() {
-  const router = useRouter();
-  useEffect(() => {
-    router.replace("/claw/pokemon-gold");
-  }, [router]);
-  return null;
+  return <ClawMachinePage slug={DEFAULT_MACHINE_SLUG} />;
 }

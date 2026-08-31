@@ -1,24 +1,24 @@
 import { queryOptions } from "@tanstack/react-query";
 import {
   COLLECTIBLES,
-  MACHINES,
   PAYMENT_METHODS,
   RECENT_PULLS,
+  SWAP_POINTS_PER_DOLLAR,
   SWAP_WINDOW_MS,
   TOP_ITEMS,
   delay,
   drawPulls,
   findMachine,
-} from "./mock";
-import { walletService } from "./wallet-service";
+} from "./mock.ts";
+import { walletService } from "./wallet-service.ts";
 import type {
   ClawMachine,
   Collectible,
   PaymentMethod,
-  Pull,
   PurchaseRequest,
   PurchaseResult,
   RecentPull,
+  SwapRequest,
   SwapResult,
   TopItem,
   Wallet,
@@ -26,21 +26,29 @@ import type {
 
 const FIVE_MINUTES = 5 * 60 * 1000;
 
+const PURCHASE_SETTLEMENT_MS = 2600;
+const SWAP_SETTLEMENT_MS = 1800;
+
+const PRIZE_HIGHLIGHT_COUNT = 5;
+
+export class SwapWindowClosedError extends Error {
+  constructor() {
+    super("The swap window for this order has closed");
+    this.name = "SwapWindowClosedError";
+  }
+}
+
 async function fetchMachine(slug: string): Promise<ClawMachine> {
   const machine = findMachine(slug);
   if (!machine) throw new Error(`Unknown claw machine: ${slug}`);
   return machine;
 }
 
-async function fetchMachineDirectory(): Promise<ClawMachine[]> {
-  return MACHINES;
-}
-
-async function fetchTopItems(): Promise<TopItem[]> {
+export async function fetchTopItems(): Promise<TopItem[]> {
   return TOP_ITEMS;
 }
 
-async function fetchRecentPulls(): Promise<RecentPull[]> {
+export async function fetchRecentPulls(): Promise<RecentPull[]> {
   return RECENT_PULLS;
 }
 
@@ -58,7 +66,7 @@ async function fetchPaymentMethods(): Promise<PaymentMethod[]> {
 async function fetchPrizeHighlights(): Promise<Collectible[]> {
   return [...COLLECTIBLES]
     .sort((a, b) => b.swapValue - a.swapValue)
-    .slice(0, 5);
+    .slice(0, PRIZE_HIGHLIGHT_COUNT);
 }
 
 export async function purchasePulls(request: PurchaseRequest): Promise<PurchaseResult> {
@@ -71,7 +79,7 @@ export async function purchasePulls(request: PurchaseRequest): Promise<PurchaseR
     });
   }
 
-  await delay(2600);
+  await delay(PURCHASE_SETTLEMENT_MS);
   return {
     orderId: `order-${request.slug}-${Date.now()}`,
     pulls: drawPulls(request.quantity),
@@ -79,10 +87,12 @@ export async function purchasePulls(request: PurchaseRequest): Promise<PurchaseR
   };
 }
 
-export async function swapPulls(pulls: Pull[]): Promise<SwapResult> {
-  await delay(1800);
+export async function swapPulls({ pulls, expiresAt }: SwapRequest): Promise<SwapResult> {
+  if (Date.now() > expiresAt) throw new SwapWindowClosedError();
+
+  await delay(SWAP_SETTLEMENT_MS);
   const credited = pulls.reduce((total, pull) => total + pull.collectible.swapValue, 0);
-  const points = Math.round(credited / 10);
+  const points = Math.round(credited * SWAP_POINTS_PER_DOLLAR);
 
   await walletService.credit({
     amount: credited,
@@ -98,24 +108,6 @@ export const clawQueries = {
     queryOptions({
       queryKey: ["claw", "machine", slug] as const,
       queryFn: () => fetchMachine(slug),
-      staleTime: FIVE_MINUTES,
-    }),
-  machineDirectory: () =>
-    queryOptions({
-      queryKey: ["claw", "machines"] as const,
-      queryFn: fetchMachineDirectory,
-      staleTime: FIVE_MINUTES,
-    }),
-  topItems: () =>
-    queryOptions({
-      queryKey: ["claw", "top-items"] as const,
-      queryFn: fetchTopItems,
-      staleTime: FIVE_MINUTES,
-    }),
-  recentPulls: () =>
-    queryOptions({
-      queryKey: ["claw", "recent-pulls"] as const,
-      queryFn: fetchRecentPulls,
       staleTime: FIVE_MINUTES,
     }),
   wallet: () =>

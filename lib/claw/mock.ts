@@ -44,8 +44,13 @@ const ODDS = [
   { key: "rare", label: "Rare", chance: 0.19, range: "$5001 - $8000" },
   { key: "uncommon", label: "Uncommon", chance: 3.48, range: "$1501 - $5000" },
   { key: "common", label: "Common", chance: 21.08, range: "$501 - $1500" },
-  { key: "base", label: "Base", chance: 75.05, range: "$250 - $500" },
+  { key: "base", label: "Base", chance: 74.53, range: "$250 - $500" },
 ] as const satisfies readonly { key: RarityKey; label: string; chance: number; range: string }[];
+
+export const DEFAULT_MACHINE_SLUG = "pokemon-gold";
+
+export const PURCHASE_POINTS_PER_DOLLAR = 0.5;
+export const SWAP_POINTS_PER_DOLLAR = 0.1;
 
 const MACHINE_DIRECTORY: MachineSummary[] = [
   { slug: "pokemon-gold", name: "Pokémon Gold", price: 500, icon: asset("/media/machines/gold.webp") },
@@ -66,7 +71,7 @@ export const MACHINES: ClawMachine[] = MACHINE_DIRECTORY.map((machine) => ({
   name: `${machine.name} Claw`,
   tagline: TAGLINES[machine.slug],
   price: machine.price,
-  points: Math.round(machine.price / 2),
+  points: Math.round(machine.price * PURCHASE_POINTS_PER_DOLLAR),
   idleVideo: asset("/media/machine-idle.mp4"),
   poster: asset("/media/machine-poster.webp"),
   averageValue: 505,
@@ -130,7 +135,6 @@ let livePullSequence = 0;
 let lastLiveId: string | null = null;
 
 export function drawRecentPull(): RecentPull {
-  // One redraw is enough to keep the same slab off two rows in a row.
   let collectible = drawCollectible();
   if (collectible.id === lastLiveId) collectible = drawCollectible();
   lastLiveId = collectible.id;

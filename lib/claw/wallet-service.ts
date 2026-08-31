@@ -16,6 +16,10 @@ export class InsufficientBalanceError extends Error {
   }
 }
 
+export function shortfallFor(balance: number | undefined, total: number) {
+  return balance === undefined ? 0 : Math.max(0, total - balance);
+}
+
 export type DebitInput = {
   amount: number;
   reason: string;

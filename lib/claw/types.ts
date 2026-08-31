@@ -82,6 +82,11 @@ export type PurchaseResult = {
   expiresAt: number;
 };
 
+export type SwapRequest = {
+  pulls: Pull[];
+  expiresAt: number;
+};
+
 export type SwapResult = {
   credited: number;
   points: number;

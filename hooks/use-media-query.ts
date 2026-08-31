@@ -18,3 +18,9 @@ export function useMediaQuery(query: string, serverFallback: boolean) {
     () => serverFallback,
   );
 }
+
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+
+export function usePrefersReducedMotion() {
+  return useMediaQuery(REDUCED_MOTION, false);
+}

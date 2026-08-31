@@ -22,7 +22,7 @@ export function SwapSuccessDialog({
       variant="sheet"
       panelClassName="sm:max-w-[420px]"
     >
-      <div className="flex flex-col items-center gap-3 p-8 pb-[max(32px,env(safe-area-inset-bottom))] text-center">
+      <div className="flex flex-col items-center gap-3 p-8 pb-safe-32 text-center">
         <span className="grid size-14 animate-dialog-in place-items-center rounded-full bg-emerald text-background">
           <Check className="size-8" strokeWidth={3} />
         </span>

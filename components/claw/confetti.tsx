@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useMediaQuery } from "@/hooks/use-media-query";
+import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 
 const COLORS = ["#ffca28", "#fbbf24", "#f5f5f5", "#c084fc"];
 const PARTICLE_COUNT = 70;
 
 export function Confetti() {
-  const prefersReducedMotion = useMediaQuery("(prefers-reduced-motion: reduce)", false);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

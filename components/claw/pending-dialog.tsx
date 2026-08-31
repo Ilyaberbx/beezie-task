@@ -40,7 +40,7 @@ export function PendingDialog({
       dismissible={false}
       panelClassName="sm:max-w-[420px]"
     >
-      <div className="flex flex-col items-center gap-4 p-6 pb-[max(24px,env(safe-area-inset-bottom))]">
+      <div className="flex flex-col items-center gap-4 p-6 pb-safe-24">
         <h2 className="text-base font-semibold text-white">What you can pull</h2>
 
         <div className="relative aspect-square w-full max-w-[220px] overflow-hidden rounded-md bg-white">

@@ -8,6 +8,7 @@ import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { shortfallFor } from "@/lib/claw/wallet-service";
 import type { ClawMachine, PaymentMethod, PaymentMethodId } from "@/lib/claw/types";
 
 type Affordability = {
@@ -58,7 +59,7 @@ export function ReviewAndPayDialog({
       variant="sheet"
       panelClassName="sm:max-w-[608px]"
     >
-      <div className="flex flex-col gap-5 p-4 pb-[max(16px,env(safe-area-inset-bottom))] sm:gap-6 sm:p-6">
+      <div className="flex flex-col gap-5 p-4 pb-safe-16 sm:gap-6 sm:p-6 sm:pb-6">
         <h2 className="text-lg font-semibold text-white">Review &amp; pay</h2>
 
         <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
@@ -73,7 +74,7 @@ export function ReviewAndPayDialog({
                   key={method.id}
                   method={method}
                   checked={method.id === selectedMethodId}
-                  shortfall={shortfallFor(method, total)}
+                  shortfall={shortfallFor(method.balance, total)}
                   onSelect={() => onSelectMethod(method.id)}
                 />
               ))}
@@ -229,11 +230,6 @@ function SummaryRow({
       </span>
     </p>
   );
-}
-
-function shortfallFor(method: PaymentMethod, total: number) {
-  if (method.balance === undefined) return 0;
-  return Math.max(0, total - method.balance);
 }
 
 function PaymentRow({

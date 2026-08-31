@@ -11,7 +11,6 @@ export function RecentPulls({ pulls: initial }: { pulls: RecentPull[] }) {
 
   return (
     <SectionPanel title="Recent Pulls" badge={<LiveDot arrivals={arrivals} />}>
-      {/* Ambient feed: it must not narrate itself over whatever the user is doing. */}
       <ul aria-live="off" className="-mb-2.5 flex flex-col">
         {pulls.map((pull, index) => (
           <li

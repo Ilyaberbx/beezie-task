@@ -9,7 +9,6 @@ export function MoreMachines({ machines }: { machines: MachineSummary[] }) {
       <h2 className="text-sm font-semibold leading-none text-foreground md:text-base md:text-white">
         More Claw Machines
       </h2>
-      {/* Absorbs the card's slack so the cards reach its bottom edge, as in Figma. */}
       <ul className="grid flex-1 grid-cols-3 gap-2">
         {machines.map((machine) => (
           <li key={machine.slug}>

@@ -2,9 +2,6 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 
-// One preference for every video on the page: the toggle on the idle stage has
-// to govern the reveal overlay too, and they live on opposite sides of a server
-// component, so the state sits in the module rather than in a provider.
 let enabled = false;
 const listeners = new Set<() => void>();
 

@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 type QuantityStepperProps = {
   value: number;
   min?: number;
-  max?: number;
+  max: number;
   onAdjust: (delta: number) => void;
   className?: string;
 };
@@ -14,7 +14,7 @@ type QuantityStepperProps = {
 export function QuantityStepper({
   value,
   min = 1,
-  max = 8,
+  max,
   onAdjust,
   className,
 }: QuantityStepperProps) {

@@ -1,27 +1,25 @@
-"use client";
-
-import { asset } from "@/lib/asset";
 import Image from "next/image";
 import Link from "next/link";
+import { asset } from "@/lib/asset";
 import { cn } from "@/lib/cn";
-import { currency } from "@/lib/format";
-import { useWallet } from "@/hooks/claw/use-wallet";
+import { DEFAULT_MACHINE_SLUG } from "@/lib/claw/mock";
+import { WalletBalance } from "./wallet-balance";
+
+const CLAW_HREF = `/claw/${DEFAULT_MACHINE_SLUG}`;
 
 const NAV = [
   { label: "Marketplace", href: "/" },
-  { label: "Claw", href: "/claw/pokemon-gold", active: true },
+  { label: "Claw", href: CLAW_HREF, active: true },
   { label: "Leaderboard", href: "/" },
   { label: "Resources", href: "/" },
   { label: "More", href: "/" },
 ];
 
 export function SiteHeader() {
-  const wallet = useWallet();
-
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-border/60 bg-background/85 backdrop-blur-md lg:h-21 lg:border-b-0 lg:backdrop-blur-none">
       <div className="mx-auto flex h-full max-w-[1440px] items-center px-4 lg:px-[50px]">
-        <Link href="/claw/pokemon-gold" aria-label="Beezie home" className="shrink-0">
+        <Link href={CLAW_HREF} aria-label="Beezie home" className="shrink-0">
           <Image
             src={asset("/media/beezie-logo.svg")}
             alt="Beezie"
@@ -61,11 +59,9 @@ export function SiteHeader() {
                       className="size-4"
                     />
                   )}
-                  {/* The label carries Figma's own gold gradient, not a flat fill. */}
                   <span
                     className={cn(
                       entry.active &&
-                        // /srgb because Figma interpolates in sRGB, not Tailwind's default oklab.
                         "bg-linear-to-b/srgb from-[#ffb000] via-[#ffca28] to-[#ffe082] bg-clip-text text-transparent",
                     )}
                   >
@@ -78,18 +74,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-6">
-          <span className="hidden h-10 items-center gap-2.5 rounded-[7px] bg-card px-4 text-sm font-medium sm:flex">
-            <Image
-              src={asset("/media/icons/wallet.svg")}
-              alt=""
-              width={16}
-              height={13}
-              className="h-[13px] w-4"
-            />
-            <span key={wallet.balance} className="tnum animate-fade-in">
-              {currency(wallet.balance)}
-            </span>
-          </span>
+          <WalletBalance />
           <Image
             src={asset("/media/avatar.webp")}
             alt="Your profile"

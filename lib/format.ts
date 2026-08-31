@@ -4,17 +4,8 @@ const currencyFormatter = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
 });
 
-const compactFormatter = new Intl.NumberFormat("en-US", {
-  notation: "compact",
-  maximumFractionDigits: 0,
-});
-
 export function currency(value: number) {
   return currencyFormatter.format(value);
-}
-
-export function compact(value: number) {
-  return compactFormatter.format(value).toLowerCase();
 }
 
 export function percent(value: number) {

@@ -38,8 +38,10 @@ export function RevealMulti({
   onClose,
 }: RevealMultiProps) {
   const remainingMs = useCountdown(open ? expiresAt : null);
-  const { minutes, seconds } = splitDuration(remainingMs);
+  const { minutes, seconds } = splitDuration(remainingMs ?? 0);
   const allSelected = selectedIds.length === pulls.length && pulls.length > 0;
+  const expired = remainingMs !== null && remainingMs <= 0;
+  const locked = isSwapping || expired;
 
   return (
     <Dialog open={open} onClose={onClose} label="Your pulls" variant="fullscreen">
@@ -53,7 +55,7 @@ export function RevealMulti({
                 key={pull.id}
                 pull={pull}
                 selected={selectedIds.includes(pull.id)}
-                disabled={isSwapping}
+                disabled={locked}
                 onToggle={() => onToggle(pull.id)}
                 onSwap={() => onSwapOne(pull)}
               />
@@ -61,18 +63,24 @@ export function RevealMulti({
           </ul>
         </div>
 
-        <div className="relative flex shrink-0 flex-col gap-3 border-t border-border bg-card px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))] md:flex-row md:items-center md:gap-6 md:px-8 md:py-4">
+        <div className="relative flex shrink-0 flex-col gap-3 border-t border-border bg-card px-4 py-3 pb-safe-12 md:flex-row md:items-center md:gap-6 md:px-8 md:py-4 md:pb-4">
           <div className="flex items-center justify-between gap-4 md:contents">
             <p className="text-xs font-medium text-secondary-foreground md:text-sm">
-              Expires in:{" "}
-              <span className="tnum text-foreground">
-                {minutes} min {String(seconds).padStart(2, "0")} sec
-              </span>
+              {expired ? (
+                <span className="text-foreground">Swap window closed</span>
+              ) : (
+                <>
+                  Expires in:{" "}
+                  <span className="tnum text-foreground">
+                    {minutes} min {String(seconds).padStart(2, "0")} sec
+                  </span>
+                </>
+              )}
             </p>
             <button
               type="button"
               onClick={onToggleAll}
-              disabled={isSwapping}
+              disabled={locked}
               className="text-sm font-medium text-secondary-foreground transition-colors hover:text-foreground disabled:opacity-50 md:order-2 md:ml-auto"
             >
               {allSelected ? "Clear" : "Select all"}
@@ -83,13 +91,15 @@ export function RevealMulti({
             <Button
               className="flex-1 md:w-[220px] md:flex-none"
               onClick={onSwapSelected}
-              disabled={selectedIds.length === 0 || isSwapping}
+              disabled={selectedIds.length === 0 || locked}
             >
-              {isSwapping
-                ? "Swap in progress"
-                : selectedIds.length === 0
-                  ? "Swap"
-                  : `Swap ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} for ${currency(selectedValue)}`}
+              {expired
+                ? "Swap window closed"
+                : isSwapping
+                  ? "Swap in progress"
+                  : selectedIds.length === 0
+                    ? "Swap"
+                    : `Swap ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} for ${currency(selectedValue)}`}
             </Button>
             <Info
               className="hidden size-4 shrink-0 text-secondary-foreground md:block"

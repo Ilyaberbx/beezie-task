@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 import { drawRecentPull } from "@/lib/claw/mock";
 import {
   createMockRecentPullsFeed,
@@ -8,14 +9,12 @@ import {
 } from "@/lib/claw/recent-pulls-feed";
 import type { RecentPull } from "@/lib/claw/types";
 
-// Swap point for the real transport: a createSocketRecentPullsFeed(url) keeping the same
-// subscribe contract — onmessage -> onPull(JSON.parse(event.data)), close on unsubscribe.
 const defaultFeed = createMockRecentPullsFeed({ next: drawRecentPull });
 
-/** Rows held on screen. A row past the window is mid-dissolve and about to be dropped. */
 export const PULL_WINDOW = 6;
 const EXIT_MS = 480;
-const SETTLE_MS = 1200; // outlasts the entrance and its gold flash
+const REDUCED_EXIT_MS = 180;
+const SETTLE_MS = 1200;
 
 export type LivePull = RecentPull & { isLive: boolean };
 
@@ -27,8 +26,11 @@ export function useLiveRecentPulls(
     initial.slice(0, PULL_WINDOW).map((pull) => ({ ...pull, isLive: false })),
   );
   const [arrivals, setArrivals] = useState(0);
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
+    const exitMs = prefersReducedMotion ? REDUCED_EXIT_MS : EXIT_MS;
+
     const timers = new Set<ReturnType<typeof setTimeout>>();
     let unsubscribe: (() => void) | undefined;
 
@@ -39,10 +41,9 @@ export function useLiveRecentPulls(
       const trim = setTimeout(() => {
         timers.delete(trim);
         setPulls((prev) => prev.slice(0, PULL_WINDOW));
-      }, EXIT_MS);
+      }, exitMs);
       timers.add(trim);
 
-      // Once the entrance has played out, stop claiming the row is still arriving.
       const settle = setTimeout(() => {
         timers.delete(settle);
         setPulls((prev) =>
@@ -52,7 +53,6 @@ export function useLiveRecentPulls(
       timers.add(settle);
     };
 
-    // A hidden tab should not bank up arrivals it will dump on return.
     const sync = () => {
       if (document.visibilityState === "visible") {
         unsubscribe ??= feed.subscribe(receive);
@@ -71,7 +71,7 @@ export function useLiveRecentPulls(
       for (const timer of timers) clearTimeout(timer);
       timers.clear();
     };
-  }, [feed]);
+  }, [feed, prefersReducedMotion]);
 
   return { pulls, arrivals };
 }

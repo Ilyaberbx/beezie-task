@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import { clawQueries, purchasePulls, swapPulls } from "@/lib/claw/queries";
-import { InsufficientBalanceError } from "@/lib/claw/wallet-service";
+import { InsufficientBalanceError, shortfallFor } from "@/lib/claw/wallet-service";
 import type { PaymentMethodId, Pull, PurchaseResult, SwapResult } from "@/lib/claw/types";
 
 export type SessionStage =
@@ -15,7 +15,7 @@ export type SessionStage =
   | "swapping"
   | "swapped";
 
-const MAX_QUANTITY = 8;
+export const MAX_QUANTITY = 8;
 
 export function usePullSession(slug: string) {
   const { data: machine } = useSuspenseQuery(clawQueries.machine(slug));
@@ -26,6 +26,7 @@ export function usePullSession(slug: string) {
   const [paymentMethodId, setPaymentMethodId] = useState<PaymentMethodId>("beezie-wallet");
   const [order, setOrder] = useState<PurchaseResult | null>(null);
   const [selectedPullIds, setSelectedPullIds] = useState<string[]>([]);
+  const [swappedPullIds, setSwappedPullIds] = useState<string[]>([]);
   const [swapResult, setSwapResult] = useState<SwapResult | null>(null);
   const [balanceError, setBalanceError] = useState<InsufficientBalanceError | null>(null);
 
@@ -42,10 +43,9 @@ export function usePullSession(slug: string) {
     mutationFn: purchasePulls,
     onMutate: () => {
       setBalanceError(null);
-      // Cleared here rather than in reset() so the result dialogs stay mounted
-      // long enough to play their exit animation.
       setOrder(null);
       setSelectedPullIds([]);
+      setSwappedPullIds([]);
       setSwapResult(null);
       setStage("pending");
     },
@@ -68,7 +68,10 @@ export function usePullSession(slug: string) {
   const swap = useMutation({
     mutationFn: swapPulls,
     onMutate: () => setStage("swapping"),
-    onSuccess: (result) => {
+    onSuccess: (result, request) => {
+      const swapped = request.pulls.map((pull) => pull.id);
+      setSwappedPullIds((current) => [...current, ...swapped]);
+      setSelectedPullIds((current) => current.filter((id) => !swapped.includes(id)));
       setSwapResult(result);
       setStage("swapped");
       refreshFunds();
@@ -78,9 +81,14 @@ export function usePullSession(slug: string) {
 
   const pulls = useMemo(() => order?.pulls ?? [], [order]);
 
+  const remainingPulls = useMemo(
+    () => pulls.filter((pull) => !swappedPullIds.includes(pull.id)),
+    [pulls, swappedPullIds],
+  );
+
   const selectedPulls = useMemo(
-    () => pulls.filter((pull) => selectedPullIds.includes(pull.id)),
-    [pulls, selectedPullIds],
+    () => remainingPulls.filter((pull) => selectedPullIds.includes(pull.id)),
+    [remainingPulls, selectedPullIds],
   );
 
   const selectedValue = useMemo(
@@ -95,13 +103,20 @@ export function usePullSession(slug: string) {
     purchase.reset();
   }, [purchase, swap]);
 
+  const dismissSwap = useCallback(() => {
+    if (remainingPulls.length === 0) {
+      reset();
+      return;
+    }
+    setStage("revealed");
+  }, [remainingPulls.length, reset]);
+
   const total = machine.price * quantity;
   const selectedMethod = paymentMethods.find(
     (method) => method.id === paymentMethodId,
   );
   const methodBalance = selectedMethod?.balance;
-  const shortfall =
-    methodBalance === undefined ? 0 : Math.max(0, total - methodBalance);
+  const shortfall = shortfallFor(methodBalance, total);
   const affordableQuantity =
     methodBalance === undefined
       ? MAX_QUANTITY
@@ -127,9 +142,9 @@ export function usePullSession(slug: string) {
 
   const toggleAll = useCallback(() => {
     setSelectedPullIds((current) =>
-      current.length === pulls.length ? [] : pulls.map((pull) => pull.id),
+      current.length === remainingPulls.length ? [] : remainingPulls.map((pull) => pull.id),
     );
-  }, [pulls]);
+  }, [remainingPulls]);
 
   return {
     machine,
@@ -153,6 +168,7 @@ export function usePullSession(slug: string) {
     affordability,
     order,
     pulls,
+    remainingPulls,
     selectedPullIds,
     selectedPulls,
     selectedValue,
@@ -165,7 +181,11 @@ export function usePullSession(slug: string) {
     finishReveal,
     togglePull,
     toggleAll,
-    swapPulls: (chosen: Pull[]) => swap.mutate(chosen),
+    swapPulls: (chosen: Pull[]) => {
+      if (!order) return;
+      swap.mutate({ pulls: chosen, expiresAt: order.expiresAt });
+    },
+    dismissSwap,
     reset,
   };
 }

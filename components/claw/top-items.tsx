@@ -4,7 +4,6 @@ import { SectionPanel } from "./section-panel";
 import { Separator } from "@/components/ui/separator";
 import type { RarityKey, TopItem } from "@/lib/claw/types";
 
-// Figma tints the fair-market value by the item's rarity.
 const FMV_COLOR: Record<RarityKey, string> = {
   ultra: "text-rarity-ultra",
   rare: "text-rarity-rare",

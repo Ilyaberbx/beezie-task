@@ -14,13 +14,13 @@ function subscribeToSeconds(onStoreChange: () => void) {
   return () => window.clearInterval(timer);
 }
 
-export function useCountdown(expiresAt: number | null) {
+export function useCountdown(expiresAt: number | null): number | null {
   const now = useSyncExternalStore(
     subscribeToSeconds,
     () => sharedNow,
     () => 0,
   );
 
-  if (expiresAt === null || now === 0) return 0;
+  if (expiresAt === null || now === 0) return null;
   return Math.max(0, expiresAt - now);
 }
