@@ -13,7 +13,7 @@ export function SectionPanel({
   className?: string;
 }) {
   return (
-    <section className="flex min-h-0 flex-1 flex-col rounded-xl border border-border bg-card py-4 shadow-sm md:rounded-panel md:py-8">
+    <section className="flex min-h-0 flex-1 flex-col rounded-xl border border-border bg-card py-4 shadow-panel md:rounded-panel md:py-8">
       <h2 className="flex items-center justify-center px-4 text-center text-lg font-semibold leading-7 text-white md:px-5 md:text-2xl md:leading-8">
         {title}
         {badge && <span className="-me-3.5 ms-2 flex">{badge}</span>}

@@ -21,7 +21,7 @@ export function RecentPulls({ pulls: initial }: { pulls: RecentPull[] }) {
             <div className="min-h-0 overflow-hidden pb-2.5">
               <div
                 data-pull-row
-                className="flex items-center gap-1 rounded-lg border border-border bg-secondary p-2 group-data-[pull=entering]:animate-pull-flash md:gap-2 md:p-2.5"
+                className="flex items-center gap-1 rounded-lg border border-border bg-secondary p-2 shadow-tile group-data-[pull=entering]:animate-pull-flash md:gap-2 md:p-2.5"
               >
                 <div className="relative size-16 shrink-0 overflow-hidden rounded-sm bg-white md:size-21">
                   <FadeImage

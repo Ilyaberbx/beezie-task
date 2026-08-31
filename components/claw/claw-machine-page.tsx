@@ -42,7 +42,7 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
             />
           </div>
 
-          <div className="flex animate-rise-in flex-col gap-5 rounded-xl border border-border bg-card-gradient px-4 py-5 shadow-sm [animation-delay:730ms] md:gap-4 md:rounded-panel md:bg-card-gradient-wide md:p-5">
+          <div className="flex animate-rise-in flex-col gap-5 rounded-xl border border-border bg-card-gradient px-4 py-5 shadow-panel [animation-delay:730ms] md:gap-4 md:rounded-panel md:bg-card-gradient-wide md:p-5">
             <div className="flex flex-col gap-4 md:gap-6">
               <div className="flex flex-col gap-1">
                 <h1 className="text-xl font-semibold leading-7 text-foreground md:text-2xl md:leading-8">

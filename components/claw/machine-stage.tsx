@@ -47,7 +47,7 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
 
   return (
     <div
-      className="relative aspect-square w-full overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-sm md:rounded-panel"
+      className="relative aspect-square w-full overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-panel md:rounded-panel"
       style={{ backgroundImage: `url(${poster})` }}
     >
       <video

@@ -31,6 +31,19 @@
 
   --shadow-card: 0 8px 8px -4px #03030308, 3px 20px 24px -4px #03030314;
 
+  /* Depth on a #131313 ground needs a top highlight as well as a drop shadow —
+     the card has to catch light, not just cast it. */
+  --shadow-panel: inset 0 1px 0 0 #ffffff0d, 0 2px 4px -2px #00000059,
+    0 14px 30px -10px #00000078;
+  --shadow-tile: inset 0 1px 0 0 #ffffff0a, 0 1px 2px -1px #00000047,
+    0 8px 16px -8px #0000006b;
+  --shadow-tile-raised: inset 0 1px 0 0 #ffffff14, 0 2px 5px -2px #00000059,
+    0 14px 26px -10px #00000080;
+  --shadow-gold: inset 0 1px 0 0 #fff6d199, 0 2px 5px -2px #ffca2833,
+    0 12px 24px -12px #ffca2866;
+  --shadow-gold-hover: inset 0 1px 0 0 #fff9e0cc, 0 3px 8px -2px #ffca2847,
+    0 16px 32px -12px #ffca2894;
+
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --default-transition-duration: 150ms;
   --default-transition-timing-function: var(--ease-out-quint);
@@ -167,6 +180,13 @@
 
 @utility tnum {
   font-variant-numeric: tabular-nums;
+}
+
+@utility bg-gold-gradient {
+  background-image: linear-gradient(to bottom, #ffe082 0%, #ffca28 46%, #ffb000 100%);
+}
+@utility bg-gold-gradient-hover {
+  background-image: linear-gradient(to bottom, #fff0b8 0%, #ffd451 46%, #ffbe1f 100%);
 }
 
 @utility scroll-fade {

@@ -20,7 +20,7 @@ export function TopItems({ items }: { items: TopItem[] }) {
           <li
             key={item.id}
             data-lift
-            className="flex flex-col gap-1 rounded-lg border border-border-strong bg-secondary p-1 transition-[background-color,border-color,translate] hover:-translate-y-px hover:border-primary/50 hover:bg-elevated active:translate-y-0"
+            className="flex flex-col gap-1 rounded-lg border border-border-strong bg-secondary p-1 shadow-tile transition-[background-color,border-color,box-shadow,translate] hover:-translate-y-px hover:border-primary/50 hover:bg-elevated hover:shadow-tile-raised active:translate-y-0"
           >
             <div className="relative aspect-square w-full overflow-hidden rounded-md bg-white">
               <FadeImage
