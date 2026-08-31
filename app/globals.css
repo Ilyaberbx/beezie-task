@@ -41,6 +41,8 @@
     0 14px 26px -10px #00000080;
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  /* A traced stroke needs even pacing; a front-loaded curve reads as a flash. */
+  --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
   --default-transition-duration: 150ms;
   --default-transition-timing-function: var(--ease-out-quint);
   --animate-sheet-in: sheet-in 320ms var(--ease-out-quint);
@@ -60,6 +62,10 @@
   --animate-stage-in: stage-in 720ms var(--ease-out-quint) both;
   --animate-stage-bloom: stage-bloom 1100ms var(--ease-out-quint) forwards;
   --animate-rise-in: rise-in 520ms var(--ease-out-quint) both;
+  --animate-check-ring: check-ring 420ms var(--ease-draw) both;
+  --animate-check-disc: check-disc 320ms var(--ease-out-quint) 340ms both;
+  --animate-check-draw: check-draw 320ms var(--ease-draw) 560ms both;
+  --animate-check-halo: check-halo 640ms var(--ease-out-quint) 640ms both;
 }
 
 @keyframes sheet-in {
@@ -129,6 +135,24 @@
 @keyframes rise-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+/* Success mark, four beats: the ring traces, the disc fills it,
+   the tick draws, one halo confirms and leaves. */
+@keyframes check-ring {
+  from { stroke-dashoffset: 164; opacity: 0.4; }
+  to { stroke-dashoffset: 0; opacity: 1; }
+}
+@keyframes check-disc {
+  from { transform: scale(0); }
+  to { transform: scale(1); }
+}
+@keyframes check-draw {
+  from { stroke-dashoffset: 32; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes check-halo {
+  from { transform: scale(0.92); opacity: 0.55; }
+  to { transform: scale(1.9); opacity: 0; }
 }
 @keyframes header-settle {
   from { opacity: 0; }
