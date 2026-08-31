@@ -22,13 +22,17 @@ export function PurchaseBar({
   className,
 }: PurchaseBarProps) {
   return (
-    <div className={cn("flex items-center gap-4", className)}>
+    <div className={cn("flex items-center gap-2 md:gap-4", className)}>
       <QuantityStepper
         value={quantity}
         max={maxQuantity}
         onAdjust={onAdjustQuantity}
       />
-      <Button className="flex-1" onClick={onStart} disabled={disabled}>
+      <Button
+        className="flex-1 rounded-lg text-base md:rounded-md md:text-sm"
+        onClick={onStart}
+        disabled={disabled}
+      >
         Start Now
       </Button>
     </div>

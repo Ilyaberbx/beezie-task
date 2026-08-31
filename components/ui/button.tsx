@@ -23,7 +23,7 @@ export function Button({ variant = "primary", className, ...props }: ButtonProps
     <button
       className={cn(
         "inline-flex h-12 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold",
-        "transition-[background-color,color,transform] duration-150 ease-out",
+        "transition-[background-color,color,scale]",
         "active:scale-[0.985] disabled:cursor-not-allowed disabled:active:scale-100",
         VARIANTS[variant],
         className,

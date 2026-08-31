@@ -4,19 +4,19 @@ import { ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
 import { cn } from "@/lib/cn";
 
-export function PromoField() {
+export function PromoField({ className }: { className?: string }) {
   const [expanded, setExpanded] = useState(false);
   const [code, setCode] = useState("");
   const fieldId = useId();
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className={cn("flex flex-col gap-2.5", className)}>
       <button
         type="button"
         onClick={() => setExpanded((current) => !current)}
         aria-expanded={expanded}
         aria-controls={fieldId}
-        className="flex w-fit items-center gap-1 text-xs font-medium text-secondary-foreground transition-colors hover:text-foreground md:pointer-events-none"
+        className="flex w-fit items-center gap-1 text-xs font-medium leading-none text-foreground transition-colors hover:text-primary md:pointer-events-none md:hover:text-foreground"
       >
         Apply promo code
         <ChevronDown
@@ -37,12 +37,12 @@ export function PromoField() {
           onChange={(event) => setCode(event.target.value)}
           placeholder="Enter Code"
           aria-label="Promo code"
-          className="h-10 min-w-0 flex-1 rounded-md border border-border bg-background px-3 text-sm text-foreground transition-colors placeholder:text-muted-foreground hover:border-border-strong focus:border-primary focus:outline-none"
+          className="h-9 min-w-0 flex-1 rounded-md border border-[#232323] bg-[#232323] px-3 text-xs text-foreground transition-colors placeholder:text-muted-foreground hover:border-border-strong focus:border-primary focus:outline-none"
         />
         <button
           type="button"
           disabled={code.trim().length === 0}
-          className="h-10 shrink-0 rounded-md bg-secondary px-4 text-sm font-medium text-foreground transition-colors hover:bg-elevated disabled:cursor-not-allowed disabled:bg-secondary/60 disabled:text-muted-foreground"
+          className="h-9 shrink-0 rounded-md bg-[#232323] px-6 text-xs font-medium text-foreground transition-colors hover:bg-elevated disabled:cursor-not-allowed disabled:text-[#7c7c7c]"
         >
           Apply
         </button>

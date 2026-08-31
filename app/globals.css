@@ -25,12 +25,16 @@
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 10px;
-  --radius-xl: 12px;
+  --radius-xl: 14px;
   --radius-2xl: 16px;
+  --radius-panel: 20px;
 
   --shadow-card: 0 8px 8px -4px #03030308, 3px 20px 24px -4px #03030314;
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Every bare transition-* inherits the curve the keyframes already use. */
+  --default-transition-duration: 150ms;
+  --default-transition-timing-function: var(--ease-out-quint);
   --animate-sheet-in: sheet-in 320ms var(--ease-out-quint);
   --animate-dialog-in: dialog-in 220ms var(--ease-out-quint);
   --animate-fade-in: fade-in 240ms var(--ease-out-quint);
@@ -38,6 +42,10 @@
   --animate-dialog-out: dialog-out 180ms var(--ease-out-quint) forwards;
   --animate-fade-out: fade-out 180ms var(--ease-out-quint) forwards;
   --animate-spin-slow: spin 1.6s linear infinite;
+  --animate-pull-in: pull-in 460ms var(--ease-out-quint);
+  --animate-pull-out: pull-out 460ms var(--ease-out-quint) forwards;
+  --animate-pull-flash: pull-flash 1100ms var(--ease-out-quint);
+  --animate-live-ping: live-ping 700ms var(--ease-out-quint);
 }
 
 @keyframes sheet-in {
@@ -64,11 +72,33 @@
   from { opacity: 1; }
   to { opacity: 0; }
 }
+@keyframes pull-in {
+  from { grid-template-rows: 0fr; opacity: 0; transform: translateY(-10px); }
+  to { grid-template-rows: 1fr; opacity: 1; transform: translateY(0); }
+}
+@keyframes pull-out {
+  0% { grid-template-rows: 1fr; opacity: 1; filter: blur(0); transform: scale(1); }
+  45% { opacity: 0; filter: blur(6px); transform: scale(0.96); }
+  100% { grid-template-rows: 0fr; opacity: 0; filter: blur(6px); transform: scale(0.96); }
+}
+@keyframes pull-flash {
+  0%, 25% {
+    border-color: var(--color-primary);
+    box-shadow: 0 8px 24px -8px #ffca28b3, 0 0 0 1px #ffca28cc;
+  }
+  100% {
+    border-color: var(--color-border-strong);
+    box-shadow: 0 8px 24px -8px #ffca2800, 0 0 0 1px #ffca2800;
+  }
+}
+@keyframes live-ping {
+  from { transform: scale(1); opacity: 0.5; }
+  to { transform: scale(2.6); opacity: 0; }
+}
 
 @layer base {
   html {
     color-scheme: dark;
-    scrollbar-color: var(--color-border-strong) var(--color-background);
   }
 
   body {
@@ -93,29 +123,41 @@
     outline: none;
   }
 
+  * {
+    scrollbar-width: none;
+  }
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-border-strong);
-    border: 3px solid var(--color-background);
-    border-radius: 999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #4d4d4d;
+    display: none;
   }
 
+  /* The scrim is hoisted out to <DialogScrim> so it can be held across a
+     whole flow; two stacked backdrops would pulse darker on every handoff. */
   dialog::backdrop {
-    background: rgb(0 0 0 / 0.72);
+    background: transparent;
   }
 }
 
 @utility tnum {
   font-variant-numeric: tabular-nums;
+}
+
+/* The panel gradient is angled off the card's own diagonal, so it differs
+   between the 390px and 1440px frames. */
+@utility bg-card-gradient {
+  background-image: linear-gradient(
+    120.5964deg,
+    #232323 0.92343%,
+    #1b1b1b 50.184%,
+    #1a1a1a 99.444%
+  );
+}
+@utility bg-card-gradient-wide {
+  background-image: linear-gradient(
+    128.5242deg,
+    #232323 0.92343%,
+    #1b1b1b 50.184%,
+    #1a1a1a 99.444%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -125,5 +167,23 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* An arrival still has to read as an arrival: fade only, no movement or blur. */
+  [data-pull="entering"] {
+    animation: fade-in 160ms linear !important;
+  }
+  [data-pull="leaving"] {
+    animation: fade-out 160ms linear forwards !important;
+  }
+  /* The gold flash is colour, not movement, so it survives the reduction. */
+  [data-pull="entering"] [data-pull-row] {
+    animation: pull-flash 900ms var(--ease-out-quint) !important;
+  }
+
+  /* Depth on hover reads as colour and shadow, not movement. Press feedback
+     still scales: it confirms an action rather than decorating one. */
+  [data-lift]:hover {
+    translate: none !important;
   }
 }

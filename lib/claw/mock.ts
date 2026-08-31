@@ -48,9 +48,9 @@ const ODDS = [
 
 const MACHINE_DIRECTORY: MachineSummary[] = [
   { slug: "pokemon-gold", name: "Pokémon Gold", price: 500, icon: "/media/machines/gold.webp" },
-  { slug: "tcg-gold", name: "TCG Gold", price: 250, icon: "/media/machines/gold.webp" },
-  { slug: "tcg-silver", name: "TCG Silver", price: 50, icon: "/media/machines/silver.webp" },
-  { slug: "wildcard", name: "Wildcard", price: 30, icon: "/media/machines/wildcard.webp" },
+  { slug: "tcg-gold", name: "TCG Gold", price: 250, icon: "/media/machines/box-dark.png" },
+  { slug: "tcg-silver", name: "TCG Silver", price: 50, icon: "/media/machines/box-dark.png" },
+  { slug: "wildcard", name: "Wildcard", price: 30, icon: "/media/machines/box-wildcard.png" },
 ];
 
 const TAGLINES: Record<string, string> = {
@@ -78,6 +78,7 @@ export const TOP_ITEMS: TopItem[] = COLLECTIBLES.slice(0, 12).map((collectible) 
   title: collectible.title,
   image: collectible.image,
   fairMarketValue: collectible.swapValue,
+  rarity: collectible.rarity,
 }));
 
 const OWNERS = ["lebnani", "0xhoneycomb", "vaultrat", "grailhunter", "slabqueen", "mintcondition"];
@@ -109,14 +110,37 @@ function drawRarity(): RarityKey {
   return cumulativeOdds.find((tier) => roll <= tier.ceiling)?.key ?? "base";
 }
 
+function pick<T>(items: readonly T[]): T {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function drawCollectible(): Collectible {
+  return pick(collectiblesByRarity[drawRarity()]);
+}
+
 export function drawPulls(quantity: number): Pull[] {
-  return Array.from({ length: quantity }, (_, index) => {
-    const pool = collectiblesByRarity[drawRarity()];
-    return {
-      id: `pull-${Date.now()}-${index}`,
-      collectible: pool[Math.floor(Math.random() * pool.length)],
-    };
-  });
+  return Array.from({ length: quantity }, (_, index) => ({
+    id: `pull-${Date.now()}-${index}`,
+    collectible: drawCollectible(),
+  }));
+}
+
+let livePullSequence = 0;
+let lastLiveId: string | null = null;
+
+export function drawRecentPull(): RecentPull {
+  // One redraw is enough to keep the same slab off two rows in a row.
+  let collectible = drawCollectible();
+  if (collectible.id === lastLiveId) collectible = drawCollectible();
+  lastLiveId = collectible.id;
+
+  return {
+    id: `${collectible.id}-live-${livePullSequence++}`,
+    title: collectible.title,
+    image: collectible.image,
+    owner: pick(OWNERS),
+    price: collectible.swapValue,
+  };
 }
 
 export function findMachine(slug: string) {

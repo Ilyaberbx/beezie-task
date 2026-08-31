@@ -36,12 +36,12 @@ export function ClawExperience({ slug }: { slug: string }) {
 
   return (
     <>
-      <div className="flex flex-col gap-6">
-        <div className="hidden md:block">{purchaseControls}</div>
-        <PromoField />
-      </div>
+      {/* Direct children of the card's stack so they inherit its Figma gap. */}
+      <div className="hidden md:block">{purchaseControls}</div>
+      {/* Figma's mobile price-to-promo gap is 20px against the stack's 16px. */}
+      <PromoField className="max-md:mt-1" />
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-background/95 px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-4 backdrop-blur-md md:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/95 px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-4 backdrop-blur-[6px] md:hidden">
         {purchaseControls}
       </div>
 

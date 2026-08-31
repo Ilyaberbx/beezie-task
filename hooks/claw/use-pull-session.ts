@@ -42,6 +42,11 @@ export function usePullSession(slug: string) {
     mutationFn: purchasePulls,
     onMutate: () => {
       setBalanceError(null);
+      // Cleared here rather than in reset() so the result dialogs stay mounted
+      // long enough to play their exit animation.
+      setOrder(null);
+      setSelectedPullIds([]);
+      setSwapResult(null);
       setStage("pending");
     },
     onSuccess: (result) => {
@@ -85,9 +90,6 @@ export function usePullSession(slug: string) {
 
   const reset = useCallback(() => {
     setStage("browsing");
-    setOrder(null);
-    setSelectedPullIds([]);
-    setSwapResult(null);
     setBalanceError(null);
     swap.reset();
     purchase.reset();

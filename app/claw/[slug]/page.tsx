@@ -45,7 +45,7 @@ export default async function ClawPage({ params }: PageProps<"/claw/[slug]">) {
     <HydrationBoundary state={dehydrate(queryClient)}>
       <SiteHeader />
 
-      <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 pb-28 md:gap-6 md:px-[46px] md:pb-12">
+      <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 pb-28 pt-2 md:gap-6 md:px-[50px] md:pb-12 md:pt-7">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6">
           <MachineStage
             name={machine.name}
@@ -53,10 +53,12 @@ export default async function ClawPage({ params }: PageProps<"/claw/[slug]">) {
             poster={machine.poster}
           />
 
-          <div className="flex flex-col gap-4 rounded-lg bg-card p-4 md:gap-4 md:p-5">
-            <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-5 rounded-xl border border-border bg-card-gradient px-4 py-5 shadow-sm md:gap-4 md:rounded-panel md:bg-card-gradient-wide md:p-5">
+            {/* Title, price, purchase bar and promo are one evenly spaced stack in
+                Figma, so they have to be siblings of a single gap. */}
+            <div className="flex flex-col gap-4 md:gap-6">
               <div className="flex flex-col gap-1">
-                <h1 className="text-xl font-semibold leading-tight text-white md:text-2xl">
+                <h1 className="text-xl font-semibold leading-7 text-foreground md:text-2xl md:leading-8">
                   {machine.name}
                 </h1>
                 <p className="text-sm font-medium leading-5 text-secondary-foreground">
@@ -64,17 +66,17 @@ export default async function ClawPage({ params }: PageProps<"/claw/[slug]">) {
                 </p>
               </div>
 
-              <p className="flex items-baseline gap-3">
-                <span className="tnum text-xl font-semibold text-white md:text-2xl">
+              <p className="flex items-center gap-2 md:gap-1.5">
+                <span className="tnum text-xl font-semibold leading-8 text-foreground md:text-2xl">
                   {currency(machine.price)}
                 </span>
-                <span className="tnum text-xs font-semibold text-primary">
+                <span className="tnum text-xs font-semibold text-primary md:text-sm">
                   +{machine.points} points
                 </span>
               </p>
-            </div>
 
-            <ClawExperience slug={slug} />
+              <ClawExperience slug={slug} />
+            </div>
 
             <Separator />
             <OddsGrid odds={machine.odds} averageValue={machine.averageValue} />
@@ -83,7 +85,8 @@ export default async function ClawPage({ params }: PageProps<"/claw/[slug]">) {
           </div>
         </div>
 
-        <div className="grid min-h-0 gap-4 md:grid-cols-2 md:gap-6 lg:h-[800px]">
+        {/* Figma caps both panels on mobile so each scrolls internally. */}
+        <div className="grid min-h-0 gap-4 max-md:grid-rows-[596px_606px] md:grid-cols-2 md:gap-6 lg:h-[800px]">
           <TopItems items={topItems} />
           <RecentPulls pulls={recentPulls} />
         </div>

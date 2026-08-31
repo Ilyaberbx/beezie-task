@@ -32,7 +32,7 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
   }, [animationOn]);
 
   return (
-    <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-card">
+    <div className="relative aspect-square w-full overflow-hidden rounded-[15px] bg-card shadow-sm md:rounded-panel">
       <video
         ref={videoRef}
         className="size-full object-cover"

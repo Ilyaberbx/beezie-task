@@ -122,7 +122,7 @@ function PullCard({
     <li
       className={cn(
         "flex flex-col gap-2 rounded-lg border bg-card p-2 transition-colors duration-200",
-        selected ? "border-primary" : "border-border-strong",
+        selected ? "border-primary" : "border-border-strong hover:border-primary/40",
       )}
     >
       <div className="relative aspect-square w-full overflow-hidden rounded-md bg-white">

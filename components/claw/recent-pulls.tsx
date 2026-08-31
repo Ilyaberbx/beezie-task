@@ -1,42 +1,72 @@
+"use client";
+
 import Image from "next/image";
 import { currency } from "@/lib/format";
+import { PULL_WINDOW, useLiveRecentPulls } from "@/hooks/claw/use-live-recent-pulls";
 import { SectionPanel } from "./section-panel";
 import type { RecentPull } from "@/lib/claw/types";
 
-export function RecentPulls({ pulls }: { pulls: RecentPull[] }) {
+export function RecentPulls({ pulls: initial }: { pulls: RecentPull[] }) {
+  const { pulls, arrivals } = useLiveRecentPulls(initial);
+
   return (
-    <SectionPanel title="Recent Pulls">
-      <ul className="flex flex-col gap-2.5 pb-1">
-        {pulls.map((pull) => (
+    <SectionPanel title="Recent Pulls" badge={<LiveDot arrivals={arrivals} />}>
+      {/* Ambient feed: it must not narrate itself over whatever the user is doing. */}
+      <ul aria-live="off" className="-mb-2.5 flex flex-col">
+        {pulls.map((pull, index) => (
           <li
             key={pull.id}
-            className="flex items-center gap-3 rounded-lg border border-border-strong bg-secondary p-2 md:gap-4 md:p-2.5"
+            data-pull={index >= PULL_WINDOW ? "leaving" : pull.isLive ? "entering" : undefined}
+            className="group grid grid-rows-[1fr] data-[pull=entering]:animate-pull-in data-[pull=leaving]:animate-pull-out"
           >
-            <div className="relative size-16 shrink-0 overflow-hidden rounded-md bg-white md:size-21">
-              <Image
-                src={pull.image}
-                alt={pull.title}
-                fill
-                sizes="84px"
-                className="object-cover"
-              />
-            </div>
-            <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-              <div className="min-w-0">
-                <p className="line-clamp-2 text-sm font-medium leading-snug text-white md:text-base">
-                  {pull.title}
-                </p>
-                <p className="mt-1 text-xs font-medium text-secondary-foreground md:mt-2 md:text-sm">
-                  {pull.owner}
-                </p>
+            <div className="min-h-0 overflow-hidden pb-2.5">
+              <div
+                data-pull-row
+                className="flex items-center gap-1 rounded-lg border border-border bg-secondary p-2 group-data-[pull=entering]:animate-pull-flash md:gap-2 md:p-2.5"
+              >
+                <div className="relative size-16 shrink-0 overflow-hidden rounded-sm bg-white md:size-21">
+                  <Image
+                    src={pull.image}
+                    alt={pull.title}
+                    fill
+                    sizes="84px"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex min-w-0 flex-1 items-start justify-between gap-3 px-2">
+                  <div className="min-w-0">
+                    <p className="line-clamp-2 text-xs font-medium leading-[1.2] text-white md:text-base md:leading-6">
+                      {pull.title}
+                    </p>
+                    <p className="mt-2 text-xs font-normal text-secondary-foreground md:text-sm">
+                      {pull.owner}
+                    </p>
+                  </div>
+                  <p className="tnum shrink-0 text-sm font-semibold leading-5 text-white md:text-lg md:leading-7">
+                    {currency(pull.price)}
+                  </p>
+                </div>
               </div>
-              <p className="tnum shrink-0 text-base font-semibold text-white md:text-xl">
-                {currency(pull.price)}
-              </p>
             </div>
           </li>
         ))}
       </ul>
     </SectionPanel>
+  );
+}
+
+function LiveDot({ arrivals }: { arrivals: number }) {
+  return (
+    <span className="relative flex size-1.5 shrink-0 items-center justify-center">
+      {arrivals > 0 && (
+        <span
+          key={arrivals}
+          aria-hidden
+          className="absolute size-1.5 rounded-full bg-primary animate-live-ping"
+        />
+      )}
+      <span aria-hidden className="size-1.5 rounded-full bg-primary" />
+      <span className="sr-only">Live</span>
+    </span>
   );
 }

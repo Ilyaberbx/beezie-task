@@ -2,7 +2,16 @@ import Image from "next/image";
 import { currency } from "@/lib/format";
 import { SectionPanel } from "./section-panel";
 import { Separator } from "@/components/ui/separator";
-import type { TopItem } from "@/lib/claw/types";
+import type { RarityKey, TopItem } from "@/lib/claw/types";
+
+// Figma tints the fair-market value by the item's rarity.
+const FMV_COLOR: Record<RarityKey, string> = {
+  ultra: "text-rarity-ultra",
+  rare: "text-rarity-rare",
+  uncommon: "text-rarity-uncommon",
+  common: "text-rarity-common",
+  base: "text-rarity-base",
+};
 
 export function TopItems({ items }: { items: TopItem[] }) {
   return (
@@ -22,7 +31,7 @@ export function TopItems({ items }: { items: TopItem[] }) {
                 className="object-cover"
               />
             </div>
-            <div className="flex flex-col gap-2 px-2 py-1.5">
+            <div className="flex flex-col gap-2 px-2 py-1 md:py-1.5">
               <p className="line-clamp-2 text-[10px] font-medium leading-[1.3] text-white">
                 {item.title}
               </p>
@@ -31,7 +40,7 @@ export function TopItems({ items }: { items: TopItem[] }) {
                 <span className="text-[10px] font-medium text-secondary-foreground">
                   FMV
                 </span>
-                <span className="tnum text-xs font-semibold text-rarity-ultra">
+                <span className={`tnum text-[10px] font-semibold md:text-xs ${FMV_COLOR[item.rarity]}`}>
                   {currency(item.fairMarketValue)}
                 </span>
               </p>

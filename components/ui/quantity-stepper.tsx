@@ -21,7 +21,7 @@ export function QuantityStepper({
   return (
     <div
       className={cn(
-        "flex h-12 w-32 shrink-0 items-center justify-between rounded-md border border-border bg-card px-4",
+        "flex h-12 w-32 shrink-0 items-center justify-center gap-5 rounded-lg border border-border bg-secondary px-5 shadow-sm md:justify-between md:px-4",
         className,
       )}
     >
@@ -67,7 +67,7 @@ function StepButton({
       aria-label={label}
       disabled={disabled}
       onClick={onClick}
-      className="grid place-items-center text-foreground transition-[color,transform] duration-150 hover:text-primary active:scale-90 disabled:pointer-events-none disabled:text-border-strong"
+      className="grid place-items-center text-foreground transition-[color,scale] hover:text-primary active:scale-90 disabled:pointer-events-none disabled:text-secondary-foreground"
     >
       {children}
     </button>

@@ -6,9 +6,11 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type MouseEvent,
   type ReactNode,
 } from "react";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/cn";
 
 type DialogProps = {
@@ -21,7 +23,70 @@ type DialogProps = {
   children: ReactNode;
 };
 
+// Hand-coupled to the 180ms in the --animate-*-out tokens (app/globals.css).
+// Change one, change both.
 const EXIT_MS = 180;
+
+/**
+ * Every mounted Dialog registers here. Two things need the shared view: the
+ * scrim, so it can be held across a whole flow instead of re-fading once per
+ * dialog, and each dialog's open gate, so a handoff plays as one panel out
+ * then the next one in rather than both at once.
+ */
+type DialogPhase = "open" | "closing";
+
+const registry = new Map<symbol, DialogPhase>();
+const listeners = new Set<() => void>();
+
+let version = 0;
+let anyOpen = false;
+
+function publish(id: symbol, phase: DialogPhase | null) {
+  if (phase === null) {
+    if (!registry.delete(id)) return;
+  } else {
+    if (registry.get(id) === phase) return;
+    registry.set(id, phase);
+  }
+  version += 1;
+  anyOpen = registry.size > 0;
+  for (const listener of listeners) listener();
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+function hasOtherDialog(id: symbol) {
+  for (const key of registry.keys()) if (key !== id) return true;
+  return false;
+}
+
+const getVersion = () => version;
+const getAnyOpen = () => anyOpen;
+const serverVersion = () => 0;
+const serverClosed = () => false;
+
+/**
+ * The one scrim behind every dialog. Native showModal() promotes a dialog to
+ * the top layer, which paints above all normal-flow content, so a plain fixed
+ * element sits underneath the panels without fighting them for z-index.
+ * Mounted once in the root layout.
+ */
+export function DialogScrim() {
+  const open = useSyncExternalStore(subscribe, getAnyOpen, serverClosed);
+
+  return (
+    <div
+      aria-hidden
+      data-open={open || undefined}
+      className="pointer-events-none fixed inset-0 z-50 bg-black/72 opacity-0 transition-opacity duration-200 data-[open]:opacity-100"
+    />
+  );
+}
 
 const PANELS = {
   center:
@@ -45,21 +110,51 @@ export function Dialog({
 }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null);
   const onCloseRef = useRef(onClose);
+  const [id] = useState(() => Symbol("dialog"));
   const [closing, setClosing] = useState(false);
+  const reduceMotion = useMediaQuery("(prefers-reduced-motion: reduce)", false);
+
+  // Subscribed for the re-render; the registry itself is read below.
+  useSyncExternalStore(subscribe, getVersion, serverVersion);
+  const hasOther = hasOtherDialog(id);
 
   useEffect(() => {
     onCloseRef.current = onClose;
   });
 
+  // The `open` prop is the only source of truth for both directions. A stage
+  // change closes a dialog the same way a click does, so programmatic exits
+  // animate too — including on dialogs that are not dismissible.
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) {
+    // Wait for the outgoing dialog to finish leaving. Dialogs in one flow have
+    // to be mutually exclusive, or this would wait forever.
+    if (open && !dialog.open && !hasOther) {
       dialog.showModal();
       dialog.focus();
     }
-    if (!open && dialog.open) dialog.close();
-  }, [open]);
+    if (open && dialog.open && !closing) publish(id, "open");
+    if (!open && dialog.open && !closing) setClosing(true);
+  }, [open, hasOther, closing, id]);
+
+  useEffect(() => {
+    if (!closing) return;
+    publish(id, "closing");
+    const timer = window.setTimeout(
+      () => {
+        ref.current?.close();
+        publish(id, null);
+        setClosing(false);
+      },
+      reduceMotion ? 0 : EXIT_MS,
+    );
+    return () => window.clearTimeout(timer);
+  }, [closing, reduceMotion, id]);
+
+  // A conditionally-rendered dialog must not leave the registry occupied, or
+  // every other dialog would wait on a panel that no longer exists.
+  useEffect(() => () => publish(id, null), [id]);
 
   useEffect(() => {
     if (!open) return;
@@ -70,22 +165,9 @@ export function Dialog({
     };
   }, [open]);
 
-  useEffect(() => {
-    if (!closing) return;
-    const timer = window.setTimeout(() => {
-      setClosing(false);
-      onCloseRef.current();
-    }, EXIT_MS);
-    return () => window.clearTimeout(timer);
-  }, [closing]);
-
   const requestClose = useCallback(() => {
     if (!dismissible) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      onCloseRef.current();
-      return;
-    }
-    setClosing(true);
+    onCloseRef.current();
   }, [dismissible]);
 
   const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
@@ -105,7 +187,6 @@ export function Dialog({
       onClick={handleClick}
       className={cn(
         "overflow-visible p-0 text-foreground",
-        "not-data-[closing]:backdrop:animate-fade-in data-[closing]:backdrop:animate-fade-out",
         PANELS[variant],
         panelClassName,
       )}

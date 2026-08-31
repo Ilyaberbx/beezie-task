@@ -250,10 +250,10 @@ function PaymentRow({
   return (
     <label
       className={cn(
-        "flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 transition-colors",
+        "flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 transition-[background-color,border-color,scale] active:scale-[0.995]",
         checked
           ? "border-primary bg-primary/6"
-          : "border-border bg-secondary/40 hover:border-border-strong",
+          : "border-border bg-secondary/40 hover:border-border-strong hover:bg-secondary/70",
       )}
     >
       <input

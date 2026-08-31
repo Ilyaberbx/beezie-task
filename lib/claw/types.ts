@@ -45,6 +45,7 @@ export type TopItem = {
   title: string;
   image: string;
   fairMarketValue: number;
+  rarity: RarityKey;
 };
 
 export type RecentPull = {
