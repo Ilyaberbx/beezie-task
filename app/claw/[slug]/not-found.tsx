@@ -12,7 +12,7 @@ export default function ClawNotFound() {
       </p>
       <Link
         href={`/claw/${DEFAULT_MACHINE_SLUG}`}
-        className="mt-2 inline-flex h-12 items-center rounded-md bg-gold-gradient px-6 text-sm font-semibold text-primary-foreground shadow-gold transition-[background-image,box-shadow] hover:bg-gold-gradient-hover hover:shadow-gold-hover"
+        className="mt-2 inline-flex h-12 items-center rounded-md bg-gold-gradient px-6 text-sm font-semibold text-primary-foreground transition-[background-image] hover:bg-gold-gradient-hover active:bg-gold-gradient-active"
       >
         Back to the Claw
       </Link>

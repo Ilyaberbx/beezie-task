@@ -39,10 +39,6 @@
     0 8px 16px -8px #0000006b;
   --shadow-tile-raised: inset 0 1px 0 0 #ffffff14, 0 2px 5px -2px #00000059,
     0 14px 26px -10px #00000080;
-  --shadow-gold: inset 0 1px 0 0 #fff6d199, 0 2px 5px -2px #ffca2833,
-    0 12px 24px -12px #ffca2866;
-  --shadow-gold-hover: inset 0 1px 0 0 #fff9e0cc, 0 3px 8px -2px #ffca2847,
-    0 16px 32px -12px #ffca2894;
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --default-transition-duration: 150ms;
@@ -187,6 +183,9 @@
 }
 @utility bg-gold-gradient-hover {
   background-image: linear-gradient(to bottom, #fff0b8 0%, #ffd451 46%, #ffbe1f 100%);
+}
+@utility bg-gold-gradient-active {
+  background-image: linear-gradient(to bottom, #ffca28 0%, #f5b800 46%, #e09a00 100%);
 }
 
 @utility scroll-fade {
