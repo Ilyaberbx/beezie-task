@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# next generated types (now emitted to .next/types)
+/types/
+
+# playwright mcp artifacts
+.playwright-mcp/

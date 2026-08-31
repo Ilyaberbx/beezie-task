@@ -1,0 +1,94 @@
+"use client";
+
+import { Sparkles, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/cn";
+
+type MachineStageProps = {
+  name: string;
+  video: string;
+  poster: string;
+};
+
+export function MachineStage({ name, video, poster }: MachineStageProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [soundOn, setSoundOn] = useState(false);
+  const [animationOn, setAnimationOn] = useState(true);
+
+  useEffect(() => {
+    const element = videoRef.current;
+    if (!element) return;
+    element.muted = !soundOn;
+  }, [soundOn]);
+
+  useEffect(() => {
+    const element = videoRef.current;
+    if (!element) return;
+    if (animationOn) {
+      void element.play().catch(() => undefined);
+    } else {
+      element.pause();
+    }
+  }, [animationOn]);
+
+  return (
+    <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-card">
+      <video
+        ref={videoRef}
+        className="size-full object-cover"
+        poster={poster}
+        preload="auto"
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-label={`${name} machine`}
+      >
+        <source src={video} type="video/mp4" />
+      </video>
+
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center gap-2 bg-gradient-to-t from-black/55 to-transparent p-3">
+        <StageToggle
+          active={soundOn}
+          onClick={() => setSoundOn((current) => !current)}
+          icon={soundOn ? <Volume2 className="size-3.5" /> : <VolumeX className="size-3.5" />}
+          label={soundOn ? "Sound on" : "Sound off"}
+        />
+        <StageToggle
+          active={animationOn}
+          onClick={() => setAnimationOn((current) => !current)}
+          icon={<Sparkles className="size-3.5" />}
+          label={animationOn ? "Animation on" : "Animation off"}
+        />
+      </div>
+    </div>
+  );
+}
+
+function StageToggle({
+  active,
+  onClick,
+  icon,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={cn(
+        "pointer-events-auto flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium",
+        "bg-black/50 backdrop-blur-sm transition-colors",
+        active ? "text-white hover:bg-black/65" : "text-secondary-foreground hover:text-white",
+      )}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
