@@ -116,9 +116,9 @@ export function DialogScrim() {
 
 const PANELS = {
   center:
-    "max-h-[100dvh] m-auto w-[calc(100vw-32px)] max-w-[608px] rounded-xl border border-border bg-card not-data-[closing]:open:animate-dialog-in data-[closing]:animate-dialog-out",
+    "max-h-[100dvh] m-auto w-[calc(100vw-32px)] max-w-[608px] rounded-[12px] border border-border-strong bg-card not-data-[closing]:open:animate-dialog-in data-[closing]:animate-dialog-out",
   sheet:
-    "max-h-[100dvh] mt-auto mb-0 w-full max-w-none rounded-t-2xl border-t border-border bg-card not-data-[closing]:open:animate-sheet-in data-[closing]:animate-sheet-out sm:m-auto sm:w-[calc(100vw-32px)] sm:rounded-2xl sm:border sm:not-data-[closing]:open:animate-dialog-in sm:data-[closing]:animate-dialog-out",
+    "max-h-[100dvh] mt-auto mb-0 w-full max-w-none rounded-t-2xl border-t border-border-strong bg-card not-data-[closing]:open:animate-sheet-in data-[closing]:animate-sheet-out sm:m-auto sm:w-[calc(100vw-32px)] sm:rounded-[12px] sm:border sm:not-data-[closing]:open:animate-dialog-in sm:data-[closing]:animate-dialog-out",
   fullscreen:
     "m-auto h-[calc(100dvh-24px)] w-[calc(100vw-24px)] max-w-none rounded-2xl border border-border bg-background not-data-[closing]:open:animate-fade-in data-[closing]:animate-fade-out",
   video:

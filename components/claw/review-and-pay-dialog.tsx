@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import { asset } from "@/lib/asset";
 import { cn } from "@/lib/cn";
 import { currency } from "@/lib/format";
 import { useId } from "react";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { Separator } from "@/components/ui/separator";
 import { shortfallFor } from "@/lib/claw/wallet-service";
 import type { ClawMachine, PaymentMethod, PaymentMethodId } from "@/lib/claw/types";
 
@@ -57,14 +57,14 @@ export function ReviewAndPayDialog({
       onClose={onClose}
       label="Review and pay"
       variant="sheet"
-      panelClassName="sm:max-w-[608px]"
+      panelClassName="sm:max-w-[720px]"
     >
-      <div className="flex flex-col gap-5 p-4 pb-safe-16 sm:gap-6 sm:p-6 sm:pb-6">
+      <div className="flex flex-col gap-5 p-4 pb-safe-16 sm:gap-5 sm:p-5 sm:pb-5">
         <h2 className="text-lg font-semibold text-white">Review &amp; pay</h2>
 
         <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
           <fieldset className="flex min-w-0 flex-col gap-2">
-            <legend className="mb-2 text-sm font-medium text-secondary-foreground">
+            <legend className="mb-3 text-sm font-semibold text-foreground">
               Pay with
             </legend>
 
@@ -101,7 +101,7 @@ export function ReviewAndPayDialog({
           </fieldset>
 
           <div className="flex min-w-0 flex-col gap-2">
-            <p className="mb-2 text-sm font-medium text-secondary-foreground">Summary</p>
+            <p className="mb-3 text-sm font-semibold text-foreground">Summary</p>
 
             <div className="flex items-center gap-3 rounded-md border border-border bg-secondary/40 p-3 sm:hidden">
               <Image
@@ -129,20 +129,20 @@ export function ReviewAndPayDialog({
               </div>
             </div>
 
-            <div className="hidden flex-col gap-3 rounded-md border border-border bg-secondary/40 p-3 sm:flex">
-              <div className="flex items-center gap-3">
+            <div className="hidden flex-1 flex-col gap-4 rounded-md border border-border-strong bg-secondary/40 p-4 sm:flex">
+              <div className="flex items-start gap-3">
                 <Image
                   src={machine.poster}
                   alt=""
-                  width={56}
-                  height={56}
-                  className="size-14 shrink-0 rounded-md object-cover"
+                  width={88}
+                  height={88}
+                  className="size-22 shrink-0 rounded-sm object-cover"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold leading-tight text-white">
+                  <p className="line-clamp-2 text-xl font-semibold leading-tight text-white">
                     {machine.name}
                   </p>
-                  <p className="tnum mt-0.5 text-xs font-medium text-secondary-foreground">
+                  <p className="tnum mt-1 text-sm font-medium text-secondary-foreground">
                     {currency(machine.price)}
                   </p>
                 </div>
@@ -150,8 +150,8 @@ export function ReviewAndPayDialog({
                   +{points} pts
                 </span>
               </div>
-              <Separator />
               <SummaryRow label="Quantity" value={String(quantity)} />
+              <hr className="border-0 border-t border-dashed border-border" />
               <SummaryRow label="Total" value={currency(total)} emphasis />
             </div>
 
@@ -196,7 +196,7 @@ export function ReviewAndPayDialog({
         )}
 
         <Button
-          className="w-full sm:mx-auto sm:w-[276px]"
+          className="w-full [&]:rounded-[10px] sm:mx-auto sm:h-9 sm:w-[328px]"
           onClick={onConfirm}
           disabled={!affordability.canAfford}
           aria-describedby={affordability.canAfford ? undefined : alertId}
@@ -246,10 +246,10 @@ function PaymentRow({
   return (
     <label
       className={cn(
-        "flex cursor-pointer items-center gap-3 rounded-md border px-4 py-3 transition-[background-color,border-color,scale] active:scale-[0.995]",
+        "flex min-h-[58px] cursor-pointer items-center gap-3 rounded-lg bg-secondary/40 px-4 py-3 transition-[background-color,border-color,scale] active:scale-[0.995]",
         checked
-          ? "border-primary bg-primary/6"
-          : "border-border bg-secondary/40 hover:border-border-strong hover:bg-secondary/70",
+          ? "border-2 border-primary"
+          : "border border-border-strong hover:bg-secondary/70",
       )}
     >
       <input
@@ -262,18 +262,28 @@ function PaymentRow({
       <span
         aria-hidden
         className={cn(
-          "grid size-3.5 shrink-0 place-items-center rounded-full border transition-colors",
-          checked ? "border-primary" : "border-border-strong",
+          "grid size-3.5 shrink-0 place-items-center rounded-full transition-colors",
+          checked ? "bg-elevated" : "bg-secondary",
         )}
       >
         <span
           className={cn(
-            "size-1.5 rounded-full transition-colors",
+            "size-[7px] rounded-full transition-colors",
             checked ? "bg-primary" : "bg-border-strong",
           )}
         />
       </span>
-      <span className="min-w-0 flex-1">
+      <span className="flex min-w-0 flex-1 items-center gap-2">
+        {method.id === "beezie-wallet" && (
+          <Image
+            src={asset("/media/beezie-mark.svg")}
+            alt=""
+            width={14}
+            height={20}
+            className="h-4 w-auto shrink-0"
+          />
+        )}
+        <span className="min-w-0">
         <span className="block text-sm font-medium text-foreground">
           {method.label}
         </span>
@@ -282,6 +292,7 @@ function PaymentRow({
             {method.note}
           </span>
         )}
+        </span>
       </span>
       {method.balance !== undefined && (
         <span className="shrink-0 text-right">
