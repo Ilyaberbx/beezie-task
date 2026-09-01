@@ -36,7 +36,10 @@ export function RevealSingle({
         <div className="relative grid flex-1 content-start gap-6 p-4 pt-12 md:grid-cols-2 md:content-center md:items-center md:gap-12 md:p-12">
           <div
             className={cn(
-              "relative aspect-square w-full overflow-hidden rounded-xl shadow-card transition-colors duration-500 md:justify-self-end md:max-w-[500px]",
+              // Sized off width alone, the square eats the whole panel on any
+              // window that is wide but not wide enough for two columns, and
+              // the swap buttons fall off the bottom. Cap it by height too.
+              "relative aspect-square w-full max-w-[42svh] justify-self-center overflow-hidden rounded-xl shadow-card transition-colors duration-500 md:max-w-[min(500px,70svh)] md:justify-self-end",
               // The artwork drains away; it has to dissolve into the dark, not into the frame's white.
               isSwapping ? "bg-elevated" : "bg-white",
             )}
