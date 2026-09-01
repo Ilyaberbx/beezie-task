@@ -65,7 +65,7 @@
   --animate-tick-settle: tick-settle 420ms var(--ease-out-quint) 580ms both;
 
   --animate-assay-drain: assay-drain 620ms var(--ease-draw) both;
-  --animate-assay-scan: assay-scan 1500ms linear infinite;
+  --animate-assay-scan: assay-scan 1500ms linear infinite backwards;
   --animate-assay-finale: assay-finale 900ms var(--ease-out-quint) both;
   --animate-assay-bloom: assay-bloom 900ms var(--ease-out-quint) both;
   --animate-assay-credit: assay-credit 900ms var(--ease-out-quint) both;
@@ -147,11 +147,14 @@
   to { transform: scale(0.93); filter: grayscale(1) saturate(1) brightness(0.3); opacity: 0.2; }
 }
 
+/* Transform only, and `backwards` on the token: without a fill the staggered
+   cards render the bar parked at full opacity through their delay, then blank it
+   to re-enter. The bar's bright line sits at 96% of its height, so -96% puts that
+   line exactly on the card's top edge; overflow-hidden covers both ends, which is
+   what the old opacity fades were for. */
 @keyframes assay-scan {
-  0% { transform: translateY(-140%); opacity: 0; }
-  8% { opacity: 1; }
-  56% { opacity: 1; }
-  64%, 100% { transform: translateY(440%); opacity: 0; }
+  0% { transform: translateY(-96%); }
+  80%, 100% { transform: translateY(400%); }
 }
 
 @keyframes assay-bloom {
@@ -407,7 +410,7 @@
     /* The sweep gradient is directional; stretched full-height it pins a bright
        band to the bottom edge. A centred glow reads as working from any angle. */
     background-image: radial-gradient(circle at center, #ffca2840 0%, #ffca2800 68%);
-    animation: assay-hold 1400ms ease-in-out infinite !important;
+    animation: assay-hold 1400ms ease-in-out infinite backwards !important;
   }
   .animate-assay-bloom {
     display: none;

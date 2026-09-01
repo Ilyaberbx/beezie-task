@@ -47,6 +47,47 @@ test.describe("with motion allowed", () => {
     // A discrete swap moves the whole 0.85 in one 5% step.
     expect(Math.max(...steps)).toBeLessThan(0.2);
   });
+
+  test("the scan starts held at the top of the card, not parked mid-card", async ({ page }) => {
+    await page.goto("/claw/tcg-silver/");
+    await page.getByRole("heading", { level: 1 }).first().waitFor();
+    await page.getByRole("button", { name: "Increase quantity" }).click();
+
+    await page.getByRole("button", { name: "Start Now" }).click();
+    const review = page.getByRole("dialog", { name: "Review and pay" });
+    await review.waitFor();
+    await review.getByRole("button", { name: "Confirm" }).click();
+
+    const result = page.getByRole("dialog", { name: "Your pulls", exact: true });
+    await result.waitFor({ timeout: 30_000 });
+    await result.getByRole("button", { name: "Select all" }).click();
+    await result.getByRole("button", { name: /^Swap 2 items for \$/ }).click();
+    await page.locator("[data-assay-scan]").first().waitFor();
+
+    // Read the first frame off the animation itself rather than racing the stagger.
+    const bars = await page.evaluate(() =>
+      [...document.querySelectorAll("[data-assay-scan]")].map((el) => {
+        const animation = el.getAnimations()[0];
+        animation.pause();
+        animation.currentTime = 0;
+        const card = el.parentElement!.parentElement!.getBoundingClientRect();
+        const bar = el.getBoundingClientRect();
+        return {
+          fill: getComputedStyle(el).animationFillMode,
+          // Where the bar's leading edge sits in the card, 0 = flush with the top.
+          leadingEdgePct: ((bar.bottom - card.top) / card.height) * 100,
+        };
+      }),
+    );
+
+    expect(bars.length).toBeGreaterThan(0);
+    for (const bar of bars) {
+      // Without a backwards fill the staggered cards show an un-animated bar.
+      expect(bar.fill).toBe("backwards");
+      expect(bar.leadingEdgePct).toBeGreaterThan(-1);
+      expect(bar.leadingEdgePct).toBeLessThan(4);
+    }
+  });
 });
 
 test("the live pull feed stops arriving behind a dialog and resumes after it", async ({ page }) => {
