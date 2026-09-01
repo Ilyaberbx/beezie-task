@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { usePullSession } from "@/hooks/claw/use-pull-session";
 import { useRevealPreload } from "@/hooks/claw/use-reveal-preload";
@@ -20,11 +21,16 @@ const SwapSuccessDialog = dynamic(() =>
   import("./swap-success-dialog").then((m) => m.SwapSuccessDialog),
 );
 
+const neverChanges = () => () => {};
+const onClient = () => true;
+const onServer = () => false;
+
 export function ClawExperience({ slug }: { slug: string }) {
   const session = usePullSession(slug);
   const { data: prizeHighlights } = useSuspenseQuery(clawQueries.prizeHighlights());
   const { source, isBuffered, prefersReducedMotion } = useRevealPreload();
   const [engaged, setEngaged] = useState(false);
+  const mounted = useSyncExternalStore(neverChanges, onClient, onServer);
 
   const revealReady = isBuffered || prefersReducedMotion;
   const isPending =
@@ -54,9 +60,15 @@ export function ClawExperience({ slug }: { slug: string }) {
       <div className="hidden md:block">{purchaseControls}</div>
       <PromoField className="max-md:mt-1" />
 
-      <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-card/95 px-4 pb-safe-16 pt-4 backdrop-blur-[6px] md:hidden">
-        {purchaseControls}
-      </div>
+      {/* Fixed to the viewport, so it has to live outside the card — an animated
+          ancestor's retained transform would otherwise capture it. */}
+      {mounted &&
+        createPortal(
+          <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border/60 bg-background/85 pb-safe-16 pl-safe-16 pr-safe-16 pt-4 backdrop-blur-md md:hidden">
+            {purchaseControls}
+          </div>,
+          document.body,
+        )}
 
       {engaged && (
         <>

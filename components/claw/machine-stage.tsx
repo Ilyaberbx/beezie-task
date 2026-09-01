@@ -47,7 +47,7 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
 
   return (
     <div
-      className="relative aspect-square w-full overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-panel md:rounded-panel"
+      className="relative mx-auto aspect-square w-full max-h-[72svh] max-w-[72svh] overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-panel md:rounded-panel"
       style={{ backgroundImage: `url(${poster})` }}
     >
       <video
@@ -67,14 +67,6 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
       >
         <source src={video} type="video/mp4" />
       </video>
-
-      {ready && (
-        <span
-          key="bloom"
-          aria-hidden
-          className="pointer-events-none absolute inset-0 animate-stage-bloom rounded-[15px] shadow-[inset_0_0_80px_-10px_#ffca2899,inset_0_0_0_1px_#ffca2866] md:rounded-panel"
-        />
-      )}
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center gap-2 bg-gradient-to-t from-black/55 to-transparent p-3">
         <StageToggle
@@ -111,7 +103,7 @@ function StageToggle({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "pointer-events-auto flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium",
+        "pointer-events-auto flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium pointer-coarse:h-10",
         "bg-black/50 backdrop-blur-sm transition-colors",
         active ? "text-white hover:bg-black/65" : "text-secondary-foreground hover:text-white",
       )}

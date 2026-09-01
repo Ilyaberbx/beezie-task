@@ -15,7 +15,7 @@ const FMV_COLOR: Record<RarityKey, string> = {
 export function TopItems({ items }: { items: TopItem[] }) {
   return (
     <SectionPanel title="Top Items">
-      <ul className="grid grid-cols-2 gap-2.5 pb-1 md:grid-cols-3">
+      <ul className="grid grid-cols-2 gap-2.5 pb-1 @[24rem]:grid-cols-3">
         {items.map((item) => (
           <li
             key={item.id}

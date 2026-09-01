@@ -11,6 +11,11 @@ import { Dialog } from "@/components/ui/dialog";
 import { shortfallFor } from "@/lib/claw/wallet-service";
 import type { ClawMachine, PaymentMethod, PaymentMethodId } from "@/lib/claw/types";
 
+const TABS = [
+  { id: "beezie-wallet", label: "Wallet" },
+  { id: "card", label: "Credit/ Debit" },
+] as const satisfies readonly { id: PaymentMethodId; label: string }[];
+
 type Affordability = {
   total: number;
   shortfall: number;
@@ -47,6 +52,8 @@ export function ReviewAndPayDialog({
   const total = machine.price * quantity;
   const points = machine.points * quantity;
   const alertId = useId();
+  const payingByCard = selectedMethodId === "card";
+  const wallets = methods.filter((method) => method.id !== "card");
   const canReduce =
     affordability.affordableQuantity >= 1 &&
     affordability.affordableQuantity < quantity;
@@ -80,21 +87,29 @@ export function ReviewAndPayDialog({
               ))}
             </div>
 
-            <div className="grid grid-cols-2 rounded-md border border-border p-0 sm:hidden">
-              {(["beezie-wallet", "card"] as const).map((id) => (
+            <div className="relative grid grid-cols-2 rounded-md border border-border sm:hidden">
+              {/* One pill that slides, rather than two that blink on and off. */}
+              <span
+                aria-hidden
+                className={cn(
+                  "absolute inset-y-0 left-0 w-1/2 rounded-[5px] bg-primary transition-transform duration-300 ease-out-quint",
+                  payingByCard && "translate-x-full",
+                )}
+              />
+              {TABS.map((tab) => (
                 <button
-                  key={id}
+                  key={tab.id}
                   type="button"
-                  onClick={() => onSelectMethod(id)}
-                  aria-pressed={selectedMethodId === id}
+                  onClick={() => onSelectMethod(tab.id)}
+                  aria-pressed={payingByCard === (tab.id === "card")}
                   className={cn(
-                    "h-11 rounded-[5px] text-sm font-semibold transition-colors",
-                    selectedMethodId === id
-                      ? "bg-primary text-primary-foreground"
-                      : "text-foreground hover:bg-secondary",
+                    "relative h-11 rounded-[5px] text-sm font-semibold transition-colors duration-300",
+                    payingByCard === (tab.id === "card")
+                      ? "text-primary-foreground"
+                      : "text-foreground",
                   )}
                 >
-                  {id === "beezie-wallet" ? "Wallet" : "Credit/ Debit"}
+                  {tab.label}
                 </button>
               ))}
             </div>
@@ -155,12 +170,30 @@ export function ReviewAndPayDialog({
               <SummaryRow label="Total" value={currency(total)} emphasis />
             </div>
 
-            {selectedMethodId === "card" && (
+            {payingByCard && (
               <p className="grid h-24 place-items-center rounded-md border border-dashed border-border text-sm text-muted-foreground sm:hidden">
                 Coinflow widget
               </p>
             )}
           </div>
+
+          {!payingByCard && (
+            <fieldset className="flex min-w-0 flex-col sm:hidden">
+              <legend className="mb-3 text-sm font-semibold text-foreground">
+                Choose Wallet
+              </legend>
+              <div className="grid grid-cols-2 gap-2.5">
+                {wallets.map((wallet) => (
+                  <WalletOption
+                    key={wallet.id}
+                    method={wallet}
+                    checked={wallet.id === selectedMethodId}
+                    onSelect={() => onSelectMethod(wallet.id)}
+                  />
+                ))}
+              </div>
+            </fieldset>
+          )}
         </div>
 
         {!affordability.canAfford && (
@@ -205,6 +238,74 @@ export function ReviewAndPayDialog({
         </Button>
       </div>
     </Dialog>
+  );
+}
+
+function WalletOption({
+  method,
+  checked,
+  onSelect,
+}: {
+  method: PaymentMethod;
+  checked: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <label
+      className={cn(
+        "flex min-w-0 cursor-pointer flex-col gap-1 rounded-lg border bg-secondary/40 px-3 py-2.5 transition-[background-color,border-color,scale] active:scale-[0.985]",
+        checked ? "border-primary" : "border-border-strong",
+      )}
+    >
+      <input
+        type="radio"
+        name="wallet"
+        checked={checked}
+        onChange={onSelect}
+        className="sr-only"
+      />
+      <span className="flex items-center gap-2">
+        <span
+          aria-hidden
+          className={cn(
+            "grid size-3.5 shrink-0 place-items-center rounded-full transition-colors",
+            checked ? "bg-elevated" : "bg-secondary",
+          )}
+        >
+          <span
+            className={cn(
+              "size-[7px] rounded-full transition-colors",
+              checked ? "bg-primary" : "bg-border-strong",
+            )}
+          />
+        </span>
+        <span
+          className={cn(
+            "truncate text-sm font-medium",
+            checked ? "text-foreground" : "text-muted-foreground",
+          )}
+        >
+          {method.label}
+        </span>
+        {method.id === "beezie-wallet" && (
+          <Image
+            src={asset("/media/beezie-mark.svg")}
+            alt=""
+            width={14}
+            height={20}
+            className={cn("ms-auto h-4 w-auto shrink-0", !checked && "opacity-50")}
+          />
+        )}
+      </span>
+      <span
+        className={cn(
+          "tnum ps-[22px] text-sm font-semibold",
+          checked ? "text-white" : "text-muted-foreground",
+        )}
+      >
+        {currency(method.balance ?? 0)}
+      </span>
+    </label>
   );
 }
 

@@ -21,7 +21,7 @@ export function OddsGrid({
   averageValue: number;
 }) {
   return (
-    <section className="flex flex-col gap-4 md:gap-2.5">
+    <section className="@container flex flex-col gap-4 md:gap-2.5">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1.5">
           <h2 className="flex items-center gap-1 text-base font-semibold leading-none text-white">
@@ -46,7 +46,7 @@ export function OddsGrid({
         </div>
       </div>
 
-      <ul className="grid grid-cols-3 gap-1 md:gap-2">
+      <ul className="grid grid-cols-2 gap-1.5 @[23rem]:grid-cols-3 md:gap-2">
         {odds.map((tier) => {
           const style = RARITY_STYLE[tier.key];
           return (
@@ -58,11 +58,13 @@ export function OddsGrid({
                 backgroundImage: `linear-gradient(90deg, rgb(${style.tint} / 0.07) 0%, rgb(${style.tint} / 0) 100%)`,
               }}
             >
-              <span className="flex items-start justify-between gap-2 text-[10px] font-medium leading-none md:font-semibold">
-                <span className={style.label}>{tier.label}</span>
-                <span className={`tnum ${style.chance}`}>{percent(tier.chance)}</span>
+              <span className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 text-[10px] font-medium leading-none md:font-semibold">
+                <span className={`whitespace-nowrap ${style.label}`}>{tier.label}</span>
+                <span className={`tnum whitespace-nowrap ${style.chance}`}>
+                  {percent(tier.chance)}
+                </span>
               </span>
-              <span className="tnum text-[8px] font-medium leading-none text-secondary-foreground md:text-[10px]">
+              <span className="tnum text-[10px] font-medium leading-none text-secondary-foreground">
                 {tier.range}
               </span>
             </li>

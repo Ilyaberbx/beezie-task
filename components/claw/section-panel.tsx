@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useElasticScroll } from "@/hooks/use-elastic-scroll";
 import { cn } from "@/lib/cn";
 
 export function SectionPanel({
@@ -12,6 +15,8 @@ export function SectionPanel({
   children: ReactNode;
   className?: string;
 }) {
+  const scroller = useElasticScroll<HTMLDivElement>();
+
   return (
     <section className="flex min-h-0 flex-1 flex-col rounded-xl border border-border bg-card py-4 shadow-panel md:rounded-panel md:py-8">
       <h2 className="flex items-center justify-center px-4 text-center text-lg font-semibold leading-7 text-white md:px-5 md:text-2xl md:leading-8">
@@ -19,8 +24,9 @@ export function SectionPanel({
         {badge && <span className="-me-3.5 ms-2 flex">{badge}</span>}
       </h2>
       <div
+        ref={scroller}
         className={cn(
-          "scroll-fade mt-4 min-h-0 flex-1 overflow-y-auto px-4 md:mt-6 md:px-5",
+          "@container scroll-fade mt-4 min-h-0 flex-1 overflow-y-auto px-4 md:mt-6 md:px-5",
           className,
         )}
       >

@@ -18,8 +18,8 @@ const NAV = [
 export function SiteHeader() {
   return (
     <header data-header className="sticky top-0 z-30 h-16 animate-fade-in border-b border-border/60 bg-background/85 backdrop-blur-md lg:h-21 lg:border-b-0 lg:backdrop-blur-none">
-      <div className="mx-auto flex h-full max-w-[1440px] items-center px-4 lg:px-[50px]">
-        <Link href={CLAW_HREF} aria-label="Beezie home" className="shrink-0">
+      <div className="mx-auto flex h-full max-w-[1440px] items-center px-4 md:px-[50px]">
+        <Link href={CLAW_HREF} aria-label="Beezie home" className="flex h-11 shrink-0 items-center pr-3 lg:pr-0">
           <Image
             src={asset("/media/beezie-logo.svg")}
             alt="Beezie"

@@ -16,7 +16,7 @@ export function PromoField({ className }: { className?: string }) {
         onClick={() => setExpanded((current) => !current)}
         aria-expanded={expanded}
         aria-controls={fieldId}
-        className="flex w-fit items-center gap-1 text-xs font-medium leading-none text-foreground transition-colors hover:text-primary md:pointer-events-none md:hover:text-foreground"
+        className="-my-3 flex w-fit items-center gap-1 py-3 text-xs font-medium leading-none text-foreground transition-colors hover:text-primary md:pointer-events-none md:hover:text-foreground"
       >
         Apply promo code
         <ChevronDown
@@ -37,12 +37,12 @@ export function PromoField({ className }: { className?: string }) {
           onChange={(event) => setCode(event.target.value)}
           placeholder="Enter Code"
           aria-label="Promo code"
-          className="h-9 min-w-0 flex-1 rounded-md border border-[#232323] bg-[#232323] px-3 text-xs text-foreground transition-colors placeholder:text-muted-foreground hover:border-border-strong focus:border-primary focus:outline-none"
+          className="h-9 min-w-0 flex-1 pointer-coarse:h-11 rounded-md border border-[#232323] bg-[#232323] px-3 text-xs text-foreground transition-colors placeholder:text-muted-foreground hover:border-border-strong focus:border-primary focus:outline-none"
         />
         <button
           type="button"
           disabled={code.trim().length === 0}
-          className="h-9 shrink-0 rounded-md bg-[#232323] px-6 text-xs font-medium text-foreground transition-colors hover:bg-elevated disabled:cursor-not-allowed disabled:text-[#7c7c7c]"
+          className="h-9 shrink-0 rounded-md pointer-coarse:h-11 bg-[#232323] px-6 text-xs font-medium text-foreground transition-colors hover:bg-elevated disabled:cursor-not-allowed disabled:text-[#7c7c7c]"
         >
           Apply
         </button>

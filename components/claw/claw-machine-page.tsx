@@ -32,7 +32,7 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
       <PageGate />
       <SiteHeader />
 
-      <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 pb-28 pt-2 md:gap-6 md:px-[50px] md:pb-12 md:pt-7">
+      <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-2 md:gap-6 md:px-[50px] md:pb-12 md:pt-7">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6">
           <div className="animate-stage-in [animation-delay:640ms]">
             <MachineStage
@@ -72,7 +72,7 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
           </div>
         </div>
 
-        <div className="grid min-h-0 gap-4 max-md:grid-rows-[596px_606px] md:grid-cols-2 md:gap-6 lg:h-[800px]">
+        <div className="grid min-h-0 gap-4 max-md:grid-rows-[repeat(2,minmax(0,min(600px,72svh)))] md:h-[min(800px,82svh)] md:grid-cols-2 md:gap-6">
           <div className="flex animate-rise-in min-h-0 flex-col [animation-delay:810ms]">
             <TopItems items={topItems} />
           </div>

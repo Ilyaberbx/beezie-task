@@ -21,9 +21,9 @@ export function RecentPulls({ pulls: initial }: { pulls: RecentPull[] }) {
             <div className="min-h-0 overflow-hidden pb-2.5">
               <div
                 data-pull-row
-                className="flex items-center gap-1 rounded-lg border border-border bg-secondary p-2 shadow-tile group-data-[pull=entering]:animate-pull-flash md:gap-2 md:p-2.5"
+                className="flex items-center gap-1 rounded-lg border border-border bg-secondary p-2 shadow-tile group-data-[pull=entering]:animate-pull-flash @[26rem]:gap-2 @[26rem]:p-2.5"
               >
-                <div className="relative size-16 shrink-0 overflow-hidden rounded-sm bg-white md:size-21">
+                <div className="relative size-16 shrink-0 overflow-hidden rounded-sm bg-white @[26rem]:size-21">
                   <FadeImage
                     src={pull.image}
                     alt={pull.title}
@@ -34,14 +34,14 @@ export function RecentPulls({ pulls: initial }: { pulls: RecentPull[] }) {
                 </div>
                 <div className="flex min-w-0 flex-1 items-start justify-between gap-3 px-2">
                   <div className="min-w-0">
-                    <p className="line-clamp-2 text-xs font-medium leading-[1.2] text-white md:text-base md:leading-6">
+                    <p className="line-clamp-2 text-xs font-medium leading-[1.2] text-white @[26rem]:text-base @[26rem]:leading-6">
                       {pull.title}
                     </p>
-                    <p className="mt-2 text-xs font-normal text-secondary-foreground md:text-sm">
+                    <p className="mt-2 text-xs font-normal text-secondary-foreground @[26rem]:text-sm">
                       {pull.owner}
                     </p>
                   </div>
-                  <p className="tnum shrink-0 text-sm font-semibold leading-5 text-white md:text-lg md:leading-7">
+                  <p className="tnum shrink-0 text-sm font-semibold leading-5 text-white @[26rem]:text-lg @[26rem]:leading-7">
                     {currency(pull.price)}
                   </p>
                 </div>
