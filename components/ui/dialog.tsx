@@ -28,11 +28,9 @@ type DialogProps = {
 
 const CONTENT_SIZED = new Set(["center", "sheet"]);
 const FULL_BLEED = new Set(["fullscreen", "video"]);
-const SCROLLS_ITS_OWN_CONTENT = "scroll-y overscroll-contain";
-
 const PANELS = {
-  center: `max-h-[calc(100svh-32px)] ${SCROLLS_ITS_OWN_CONTENT} m-auto w-[calc(100vw-32px)] max-w-[608px] rounded-[12px] border border-border-strong bg-card not-data-[closing]:open:animate-dialog-in data-[closing]:animate-dialog-out`,
-  sheet: `max-h-[100svh] ${SCROLLS_ITS_OWN_CONTENT} mt-auto mb-0 w-full max-w-none rounded-t-2xl border-t border-border-strong bg-card not-data-[closing]:open:animate-sheet-in data-[closing]:animate-sheet-out sm:m-auto sm:max-h-[calc(100svh-32px)] sm:w-[calc(100vw-32px)] sm:rounded-[12px] sm:border sm:not-data-[closing]:open:animate-dialog-in sm:data-[closing]:animate-dialog-out`,
+  center: `max-h-[calc(100svh-32px)] overflow-hidden m-auto w-[calc(100vw-32px)] max-w-[608px] rounded-[12px] border border-border-strong bg-card not-data-[closing]:open:animate-dialog-in data-[closing]:animate-dialog-out`,
+  sheet: `max-h-[100svh] overflow-hidden mt-auto mb-0 w-full max-w-none rounded-t-2xl border-t border-border-strong bg-card not-data-[closing]:open:animate-sheet-in data-[closing]:animate-sheet-out sm:m-auto sm:max-h-[calc(100svh-32px)] sm:w-[calc(100vw-32px)] sm:rounded-[12px] sm:border sm:not-data-[closing]:open:animate-dialog-in sm:data-[closing]:animate-dialog-out`,
   fullscreen:
     "overflow-hidden m-0 inset-0 h-auto max-h-none w-auto max-w-none rounded-none border-0 bg-background not-data-[closing]:open:animate-fade-in data-[closing]:animate-fade-out md:m-auto md:h-[calc(100svh-32px)] md:w-[calc(100vw-32px)] md:rounded-2xl md:border md:border-border",
   video:
