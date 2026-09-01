@@ -116,16 +116,21 @@ export function DialogScrim() {
 
 /* Content-sized panels must scroll themselves: a short screen (a phone in
    landscape, or any phone once the shortfall alert appears) pushes the primary
-   action past max-height, and an unscrollable panel simply hides it. */
+   action past max-height, and an unscrollable panel simply hides it.
+
+   svh, never dvh: dvh tracks Safari's retracting search bar, so an open panel
+   grows the moment the user scrolls — and the ResizeObserver below animates it
+   there, which turns a chrome change into a modal that visibly inflates. svh
+   pins every panel to the smallest viewport, so the box never moves. */
 const PANELS = {
   center:
-    "max-h-[calc(100dvh-32px)] overflow-y-auto overscroll-contain m-auto w-[calc(100vw-32px)] max-w-[608px] rounded-[12px] border border-border-strong bg-card not-data-[closing]:open:animate-dialog-in data-[closing]:animate-dialog-out",
+    "max-h-[calc(100svh-32px)] overflow-y-auto overscroll-contain m-auto w-[calc(100vw-32px)] max-w-[608px] rounded-[12px] border border-border-strong bg-card not-data-[closing]:open:animate-dialog-in data-[closing]:animate-dialog-out",
   sheet:
-    "max-h-[100dvh] overflow-y-auto overscroll-contain mt-auto mb-0 w-full max-w-none rounded-t-2xl border-t border-border-strong bg-card not-data-[closing]:open:animate-sheet-in data-[closing]:animate-sheet-out sm:m-auto sm:max-h-[calc(100dvh-32px)] sm:w-[calc(100vw-32px)] sm:rounded-[12px] sm:border sm:not-data-[closing]:open:animate-dialog-in sm:data-[closing]:animate-dialog-out",
+    "max-h-[100svh] overflow-y-auto overscroll-contain mt-auto mb-0 w-full max-w-none rounded-t-2xl border-t border-border-strong bg-card not-data-[closing]:open:animate-sheet-in data-[closing]:animate-sheet-out sm:m-auto sm:max-h-[calc(100svh-32px)] sm:w-[calc(100vw-32px)] sm:rounded-[12px] sm:border sm:not-data-[closing]:open:animate-dialog-in sm:data-[closing]:animate-dialog-out",
   fullscreen:
-    "overflow-visible m-auto h-[calc(100dvh-24px)] w-[calc(100vw-24px)] max-w-none rounded-2xl border border-border bg-background not-data-[closing]:open:animate-fade-in data-[closing]:animate-fade-out",
+    "overflow-visible m-auto h-[calc(100svh-24px)] w-[calc(100vw-24px)] max-w-none rounded-2xl border border-border bg-background not-data-[closing]:open:animate-fade-in data-[closing]:animate-fade-out",
   video:
-    "overflow-visible m-0 h-dvh max-h-none w-screen max-w-none rounded-none border-0 bg-black not-data-[closing]:open:animate-fade-in data-[closing]:animate-fade-out",
+    "overflow-visible m-0 h-svh max-h-none w-screen max-w-none rounded-none border-0 bg-black not-data-[closing]:open:animate-fade-in data-[closing]:animate-fade-out",
 };
 
 export function Dialog({
