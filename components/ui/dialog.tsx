@@ -72,8 +72,9 @@ export function Dialog({
   const reduceMotion = usePrefersReducedMotion();
   const morphable = CONTENT_SIZED.has(variant) && !reduceMotion;
 
-  const closing = useDialogChoreography({ ref, open, morphable, reduceMotion, onOpened });
+  // Ahead of the choreography: it calls showModal(), which scrolls the page away.
   useScrollLock(open);
+  const closing = useDialogChoreography({ ref, open, morphable, reduceMotion, onOpened });
 
   useEffect(() => {
     onCloseRef.current = onClose;
