@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { currency } from "@/lib/format";
@@ -70,13 +69,17 @@ export function PendingDialog({
           Approx market value: {currency(preview.swapValue)}
         </p>
 
-        <p
+        <div
           role="status"
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary/45 text-sm font-semibold text-primary-foreground/70"
+          className="flex w-full max-w-[220px] flex-col items-center gap-3 pt-1"
         >
-          <RefreshCw className="size-4 animate-spin-slow" strokeWidth={2.5} />
-          Do Not Refresh
-        </p>
+          <div className="h-px w-full overflow-hidden rounded-full bg-border-strong">
+            <div className="h-full w-1/4 animate-sweep rounded-full bg-primary" />
+          </div>
+          <p className="text-xs font-medium text-muted-foreground">
+            Preparing your pull — don&rsquo;t refresh
+          </p>
+        </div>
       </div>
     </Dialog>
   );
