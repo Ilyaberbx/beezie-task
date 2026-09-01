@@ -9,7 +9,7 @@ import { useVideoPlayback } from "@/hooks/use-video-playback";
 import { cn } from "@/lib/cn";
 
 const stageFillsTheRowItSharesWithTheCard =
-  "relative mx-auto aspect-square w-full max-h-[72svh] max-w-[72svh] overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-panel md:aspect-auto md:h-full md:max-h-none md:max-w-none md:rounded-panel";
+  "relative mx-auto aspect-square w-full max-h-[72svh] max-w-[72svh] overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-panel md:rounded-panel md:landscape:aspect-auto md:landscape:h-full md:landscape:max-h-none md:landscape:max-w-none";
 
 const videoOutOfFlowSoTheRowSetsTheHeight =
   "absolute inset-0 size-full object-cover transition-opacity duration-700 ease-out";

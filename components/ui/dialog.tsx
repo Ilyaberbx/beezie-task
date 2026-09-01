@@ -112,6 +112,7 @@ export function Dialog({
           aria-label="Close"
           className={cn(
             "absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-md text-secondary-foreground transition-colors hover:bg-secondary hover:text-foreground",
+            "before:absolute before:-inset-1.5 before:content-['']",
             FULL_BLEED.has(variant) && "top-safe-16",
           )}
         >

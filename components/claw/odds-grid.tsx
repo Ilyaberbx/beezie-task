@@ -36,7 +36,7 @@ export function OddsGrid({
         </div>
       </div>
 
-      <ul className="grid grid-cols-2 gap-1.5 @[23rem]:grid-cols-3 md:gap-2">
+      <ul className="grid grid-cols-2 gap-1.5 @[23rem]:grid-cols-3 @[38rem]:grid-cols-5 md:gap-2">
         {odds.map((tier) => {
           const style = RARITY_STYLE[tier.key];
           return (

@@ -3,6 +3,8 @@
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
+  --breakpoint-md: 744px;
+
   --color-background: #131313;
   --color-card: #1a1a1a;
   --color-secondary: #252525;
