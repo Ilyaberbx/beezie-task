@@ -19,8 +19,7 @@ test("a wallet that cannot cover the order blocks Confirm until another is picke
 
   const alert = review.getByRole("alert");
   await expect(alert).toBeVisible();
-  await expect(alert).toContainText("Not enough in your External wallet");
-  await expect(alert).toContainText("$450 short");
+  await expect(alert).toContainText("$450 short in your External wallet");
 
   await expect(confirm).toBeDisabled();
   const describedBy = await confirm.getAttribute("aria-describedby");

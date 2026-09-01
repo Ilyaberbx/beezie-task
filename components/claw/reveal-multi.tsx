@@ -51,8 +51,8 @@ export function RevealMulti({
   return (
     <Dialog open={open} onClose={onClose} label="Your pulls" variant="fullscreen">
       <div className="relative flex h-full flex-col">
-        <div className="relative min-h-0 flex-1 scroll-y overscroll-contain p-4 pt-14 md:p-8 md:pt-14">
-          <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
+        <div className="relative min-h-0 flex-1 scroll-y overscroll-contain px-4 pb-4 pt-14 md:p-8 md:pt-[66px]">
+          <ul className="grid grid-cols-2 gap-x-2 gap-y-2.5 md:grid-cols-4 md:gap-4">
             {pulls.map((pull, index) => (
               <PullCard
                 key={pull.id}
@@ -70,7 +70,7 @@ export function RevealMulti({
           </ul>
         </div>
 
-        <div className="relative flex shrink-0 flex-col gap-3 border-t border-border bg-card px-4 py-3 pb-safe-12 md:flex-row md:items-center md:gap-6 md:px-8 md:py-4 md:pb-4">
+        <div className="relative flex shrink-0 flex-col gap-4 border-t border-border bg-card px-4 pt-4 pb-safe-16 md:h-21 md:flex-row md:items-center md:gap-6 md:px-8 md:pt-0 md:pb-0">
           <div className="flex items-center justify-between gap-4 md:contents">
             <SwapWindow expiresAt={open ? expiresAt : null} />
             <button
@@ -83,9 +83,9 @@ export function RevealMulti({
             </button>
           </div>
 
-          <div className="flex items-center gap-4 md:order-3">
+          <div className="flex items-center gap-2 md:order-3">
             <Button
-              className="flex-1 md:w-[220px] md:flex-none"
+              className="[&]:h-11 flex-1 md:w-[288px] md:flex-none"
               onClick={onSwapSelected}
               disabled={selectedIds.length === 0 || locked}
             >
@@ -97,7 +97,7 @@ export function RevealMulti({
               })}
             </Button>
             <Info
-              className="hidden size-4 shrink-0 text-secondary-foreground md:block"
+              className="hidden size-6 shrink-0 text-secondary-foreground md:block"
               strokeWidth={2}
               aria-hidden
             />
@@ -113,7 +113,7 @@ function SwapWindow({ expiresAt }: { expiresAt: number | null }) {
   const { minutes, seconds } = splitDuration(remainingMs ?? 0);
 
   return (
-    <p className="text-xs font-medium text-secondary-foreground md:text-sm">
+    <p className="text-xs font-medium text-secondary-foreground">
       {isSwapWindowExpired(remainingMs) ? (
         <span className="text-foreground">Swap window closed</span>
       ) : (
@@ -154,7 +154,7 @@ function PullCard({
   return (
     <li
       className={cn(
-        "flex flex-col gap-2 rounded-lg border bg-card p-2 transition-colors duration-200",
+        "flex flex-col rounded-lg border bg-card p-1 transition-colors duration-200",
         selected ? "border-primary" : "border-border-strong hover:border-primary/40",
         assaying && "border-primary",
         receding && "animate-assay-recede",
@@ -206,17 +206,19 @@ function PullCard({
         </button>
       </div>
 
-      <p className="line-clamp-2 min-h-[2lh] px-1 text-xs font-medium leading-snug text-white">
-        {collectible.title}
-      </p>
+      <div className="flex flex-col px-0.5 pb-1.5 pt-2.5 md:px-2 md:pb-2.5 md:pt-3.5">
+        <p className="line-clamp-2 min-h-[2lh] text-xs font-medium leading-4 text-white md:text-sm md:leading-5">
+          {collectible.title}
+        </p>
 
-      <Button
-        className="h-9 w-full text-xs"
-        onClick={onSwap}
-        disabled={disabled || selected}
-      >
-        Swap for {currency(collectible.swapValue)}
-      </Button>
+        <Button
+          className="mt-2.5 w-full text-xs [&]:h-9 md:mt-6 md:text-sm md:[&]:h-10"
+          onClick={onSwap}
+          disabled={disabled || selected}
+        >
+          Swap for {currency(collectible.swapValue)}
+        </Button>
+      </div>
     </li>
   );
 }

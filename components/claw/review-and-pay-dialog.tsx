@@ -185,33 +185,28 @@ export function ReviewAndPayDialog({
         {!affordability.canAfford && (
           <Alert
             id={alertId}
-            title={`Not enough in your ${affordability.methodLabel}`}
+            title={`${currency(affordability.shortfall)} short in your ${affordability.methodLabel}`}
             actions={
               <>
+                {canReduce && (
+                  <Button
+                    variant="outline"
+                    className="px-3 text-xs [&]:h-8"
+                    onClick={() => onReduceQuantity(affordability.affordableQuantity)}
+                  >
+                    Reduce to {affordability.affordableQuantity}
+                  </Button>
+                )}
                 <Button
                   variant="outline"
-                  className="h-9 px-3 text-xs"
+                  className="px-3 text-xs [&]:h-8"
                   onClick={() => onSelectMethod("card")}
                 >
                   Pay with Credit / Debit
                 </Button>
-                {canReduce && (
-                  <Button
-                    variant="outline"
-                    className="h-9 px-3 text-xs"
-                    onClick={() => onReduceQuantity(affordability.affordableQuantity)}
-                  >
-                    Reduce to {affordability.affordableQuantity} pull
-                    {affordability.affordableQuantity > 1 ? "s" : ""}
-                  </Button>
-                )}
               </>
             }
-          >
-            This order costs {currency(total)} and you are{" "}
-            {currency(affordability.shortfall)} short. Pick another payment method or
-            lower the quantity.
-          </Alert>
+          />
         )}
 
         <Button
