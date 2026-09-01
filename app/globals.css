@@ -75,6 +75,8 @@
   --animate-assay-bloom: assay-bloom 900ms var(--ease-out-quint) both;
   --animate-assay-credit: assay-credit 900ms var(--ease-out-quint) both;
   --animate-assay-recede: assay-recede 420ms var(--ease-out-quint) both;
+  --animate-assay-mark: assay-mark 460ms var(--ease-out-quint) both;
+  --animate-assay-mark-out: assay-mark-out 900ms var(--ease-out-quint) both;
 }
 
 @keyframes sheet-in {
@@ -168,6 +170,18 @@
   30% { opacity: 1; transform: translateY(-2px) scale(1); }
   72% { opacity: 1; transform: translateY(-14px) scale(1); }
   100% { opacity: 0; transform: translateY(-46px) scale(1); }
+}
+/* Registration marks: the frame the appraisal is measured in. They draw in
+   corner by corner as the card drains, hold through the wait, and are thrown
+   off by the finale. */
+@keyframes assay-mark {
+  from { opacity: 0; transform: scale(1.7); }
+  to { opacity: 0.85; transform: scale(1); }
+}
+@keyframes assay-mark-out {
+  0% { opacity: 0.85; transform: scale(1); }
+  30% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 0; transform: scale(1.55); }
 }
 /* Everything not being swapped steps back so the assay reads. */
 @keyframes assay-recede {
@@ -264,6 +278,13 @@
     #ffca28d9 88%,
     #fff6d9f2 96%,
     #ffca2800 100%
+  );
+}
+@utility bg-assay-lines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #ffffff14 0 1px,
+    transparent 1px 4px
   );
 }
 @utility bg-assay-bloom {

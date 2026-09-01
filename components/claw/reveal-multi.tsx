@@ -7,7 +7,6 @@ import { Dialog } from "@/components/ui/dialog";
 import { cn } from "@/lib/cn";
 import { currency, splitDuration } from "@/lib/format";
 import { useCountdown } from "@/hooks/claw/use-countdown";
-import { Confetti } from "./confetti";
 import { SwapAssay } from "./swap-assay";
 import type { Pull } from "@/lib/claw/types";
 
@@ -51,14 +50,13 @@ export function RevealMulti({
   return (
     <Dialog open={open} onClose={onClose} label="Your pulls" variant="fullscreen">
       <div className="relative flex h-full flex-col">
-        <Confetti />
-
         <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 pt-14 md:p-8 md:pt-14">
           <ul className="grid grid-cols-2 gap-2.5 md:grid-cols-4 md:gap-4">
-            {pulls.map((pull) => (
+            {pulls.map((pull, index) => (
               <PullCard
                 key={pull.id}
                 pull={pull}
+                index={index}
                 selected={selectedIds.includes(pull.id)}
                 assaying={swappingIds.includes(pull.id)}
                 settling={isSettling}
@@ -123,6 +121,7 @@ export function RevealMulti({
 
 function PullCard({
   pull,
+  index,
   selected,
   assaying,
   settling,
@@ -132,6 +131,7 @@ function PullCard({
   onSwap,
 }: {
   pull: Pull;
+  index: number;
   selected: boolean;
   assaying: boolean;
   settling: boolean;
@@ -168,7 +168,12 @@ function PullCard({
           )}
         />
         {assaying && (
-          <SwapAssay value={collectible.swapValue} settling={settling} compact />
+          <SwapAssay
+            value={collectible.swapValue}
+            settling={settling}
+            delayMs={index * 130}
+            compact
+          />
         )}
         <button
           type="button"

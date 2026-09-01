@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { cn } from "@/lib/cn";
 import { currency } from "@/lib/format";
-import { Confetti } from "./confetti";
 import { SwapAssay } from "./swap-assay";
 import type { Pull } from "@/lib/claw/types";
 
@@ -31,8 +30,6 @@ export function RevealSingle({
   return (
     <Dialog open={open} onClose={onKeep} label="Your pull" variant="fullscreen">
       <div className="relative flex h-full flex-col overflow-y-auto">
-        <Confetti />
-
         <div className="relative grid flex-1 content-center-safe gap-6 p-4 pt-12 md:grid-cols-2 md:content-center md:items-center md:gap-12 md:p-12">
           <div
             className={cn(

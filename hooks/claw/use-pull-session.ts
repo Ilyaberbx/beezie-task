@@ -76,7 +76,6 @@ export function usePullSession(slug: string) {
     onSuccess: (result) => {
       setSwapResult(result);
       setStage("settling");
-      refreshFunds();
     },
     onError: () => setStage("revealed"),
   });
@@ -93,9 +92,12 @@ export function usePullSession(slug: string) {
       setSwappedPullIds((current) => [...current, ...swapped]);
       setSelectedPullIds((current) => current.filter((id) => !swapped.includes(id)));
       setStage("swapped");
+      // The wallet ticks over when the value has finished leaving the card, not
+      // while it is still on screen.
+      refreshFunds();
     }, ASSAY_FINALE_MS);
     return () => window.clearTimeout(timer);
-  }, [stage, swapVariables]);
+  }, [stage, swapVariables, refreshFunds]);
 
   /** Which pulls the assay is playing over — through the finale, not just the wait. */
   const assaying = stage === "swapping" || stage === "settling";
