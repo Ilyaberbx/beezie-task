@@ -17,16 +17,16 @@ const NAV = [
 
 export function SiteHeader() {
   return (
-    <header data-header className="sticky top-0 z-30 pt-safe-0 animate-fade-in border-b border-border/60 bg-background/85 backdrop-blur-md lg:border-b-0 lg:backdrop-blur-none">
-      <div className="mx-auto flex h-16 max-w-[1440px] items-center px-4 md:px-[50px] lg:h-21">
-        <Link href={CLAW_HREF} aria-label="Beezie home" className="flex h-11 min-w-11 shrink-0 items-center pr-3 lg:min-w-0 lg:pr-0">
+    <header data-header className="sticky top-0 z-30 pt-safe-0 animate-fade-in border-b border-border/60 bg-background lg:border-b-0 lg:bg-background/85">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center px-4 md:h-21 md:px-8 lg:px-[50px]">
+        <Link href={CLAW_HREF} aria-label="Beezie home" className="flex h-11 min-w-11 shrink-0 items-center pr-3 md:min-w-0 md:pr-0">
           <Image
             src={asset("/media/beezie-logo.svg")}
             alt="Beezie"
             width={94}
             height={40}
             priority
-            className="hidden lg:block"
+            className="hidden md:block"
           />
           <Image
             src={asset("/media/beezie-mark.svg")}
@@ -34,7 +34,7 @@ export function SiteHeader() {
             width={22}
             height={32}
             priority
-            className="lg:hidden"
+            className="md:hidden"
           />
         </Link>
 
@@ -89,7 +89,7 @@ export function SiteHeader() {
             alt="Your profile"
             width={40}
             height={40}
-            className="size-9 rounded-full object-cover ring-1 ring-border lg:size-10"
+            className="size-9 rounded-full object-cover ring-1 ring-border md:size-10"
           />
         </div>
       </div>

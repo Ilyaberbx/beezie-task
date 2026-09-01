@@ -35,7 +35,7 @@ export function ClawExperience({ slug }: { slug: string }) {
   const mounted = useMounted();
 
   useImagePreload(CATALOGUE_THUMBS);
-  useImagePreload(session.pulls.map((pull) => pull.collectible.image));
+  useImagePreload(session.pulls.length === 1 ? [session.pulls[0].collectible.image] : []);
 
   const revealReady = isBuffered || prefersReducedMotion;
   const isPending = isPendingStage(session.stage, revealReady);
@@ -56,7 +56,7 @@ export function ClawExperience({ slug }: { slug: string }) {
   );
 
   const viewportPinnedPurchaseBar = (
-    <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border/60 bg-background/85 pb-safe-16 pl-safe-16 pr-safe-16 pt-4 backdrop-blur-md md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border/60 bg-background pb-safe-0 pl-safe-16 pr-safe-16 pt-4 md:hidden">
       {purchaseControls}
     </div>
   );

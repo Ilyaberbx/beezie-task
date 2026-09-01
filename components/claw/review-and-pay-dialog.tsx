@@ -71,7 +71,7 @@ export function ReviewAndPayDialog({
               ))}
             </div>
 
-            <div className="relative grid grid-cols-2 rounded-md border border-border sm:hidden">
+            <div className="relative grid grid-cols-2 rounded-lg border border-border p-1 sm:hidden">
               <SlidingTabPill shifted={payingByCard} />
               {TABS.map((tab) => (
                 <button
@@ -80,7 +80,7 @@ export function ReviewAndPayDialog({
                   onClick={() => onSelectMethod(tab.id)}
                   aria-pressed={payingByCard === (tab.id === "card")}
                   className={cn(
-                    "relative h-11 rounded-[5px] text-sm font-semibold transition-colors duration-300",
+                    "relative h-11 rounded-md text-sm font-semibold transition-colors duration-300",
                     payingByCard === (tab.id === "card")
                       ? "text-primary-foreground"
                       : "text-foreground",
@@ -95,7 +95,7 @@ export function ReviewAndPayDialog({
           <div className="flex min-w-0 flex-col gap-2">
             <p className="mb-3 text-sm font-semibold text-foreground">Summary</p>
 
-            <div className="flex items-center gap-3 rounded-md border border-border bg-secondary/40 p-3 sm:hidden">
+            <div className="flex items-center gap-3 rounded-md border border-border bg-card-gradient p-3 sm:hidden">
               <Image
                 src={machine.poster}
                 alt=""
@@ -149,7 +149,7 @@ export function ReviewAndPayDialog({
             </div>
 
             {payingByCard && (
-              <p className="grid h-24 place-items-center rounded-md border border-dashed border-border text-sm text-muted-foreground sm:hidden">
+              <p className="grid h-40 place-items-center text-sm text-muted-foreground sm:hidden">
                 Coinflow widget
               </p>
             )}
@@ -192,7 +192,7 @@ function SlidingTabPill({ shifted }: { shifted: boolean }) {
     <span
       aria-hidden
       className={cn(
-        "absolute inset-y-0 left-0 w-1/2 rounded-[5px] bg-primary transition-transform duration-300 ease-out-quint",
+        "absolute inset-1 right-auto w-[calc(50%-4px)] rounded-md bg-primary transition-transform duration-300 ease-out-quint",
         shifted && "translate-x-full",
       )}
     />

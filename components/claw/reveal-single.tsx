@@ -6,8 +6,8 @@ import { currency } from "@/lib/format";
 import { SwapAssay } from "./swap-assay";
 import type { Pull } from "@/lib/claw/types";
 
-const artworkCappedByHeightSoTheSwapButtonsStayOnScreen =
-  "relative aspect-square w-full max-w-[min(80%,34svh)] justify-self-center overflow-hidden rounded-xl shadow-card transition-colors duration-500 md:max-w-[min(440px,60svh)] md:justify-self-end";
+const artworkSharesTheTextColumnGutters =
+  "relative aspect-square w-full justify-self-center overflow-hidden rounded-xl shadow-card transition-colors duration-500 sm:max-w-[min(70%,52svh)] md:landscape:max-w-[648px] md:landscape:justify-self-end";
 
 type RevealSingleProps = {
   open: boolean;
@@ -32,10 +32,10 @@ export function RevealSingle({
   return (
     <Dialog open={open} onClose={onKeep} label="Your pull" variant="fullscreen">
       <div className="relative flex h-full flex-col scroll-y overscroll-contain">
-        <div className="relative grid flex-1 content-center-safe gap-6 p-4 pt-12 md:grid-cols-2 md:content-center md:items-center md:gap-12 md:p-12">
+        <div className="relative grid flex-1 content-center-safe gap-6 p-4 pt-12 sm:gap-8 sm:p-8 sm:pt-16 md:landscape:grid-cols-2 md:landscape:content-center md:landscape:items-start md:landscape:gap-12 md:landscape:p-12">
           <div
             className={cn(
-              artworkCappedByHeightSoTheSwapButtonsStayOnScreen,
+              artworkSharesTheTextColumnGutters,
               artworkDissolvesIntoDark ? "bg-elevated" : "bg-white",
             )}
           >
@@ -44,7 +44,7 @@ export function RevealSingle({
               alt={collectible.title}
               fill
               priority
-              sizes="(min-width: 768px) 500px, 90vw"
+              sizes="(min-width: 744px) 648px, 100vw"
               className={cn(
                 "object-cover",
                 isSettling && "animate-assay-finale",
@@ -59,7 +59,7 @@ export function RevealSingle({
 
           <div
             className={cn(
-              "flex flex-col gap-6 md:max-w-[446px]",
+              "flex flex-col gap-6 sm:mx-auto sm:w-full sm:max-w-[560px] md:landscape:mx-0 md:landscape:max-w-[584px]",
               isSwapping && "animate-assay-recede",
             )}
           >

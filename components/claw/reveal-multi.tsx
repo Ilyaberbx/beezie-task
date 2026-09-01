@@ -154,7 +154,7 @@ function PullCard({
   return (
     <li
       className={cn(
-        "flex flex-col rounded-lg border bg-card p-1 transition-colors duration-200",
+        "flex flex-col rounded-lg border bg-elevated p-1 transition-colors duration-200",
         selected ? "border-primary" : "border-border-strong hover:border-primary/40",
         assaying && "border-primary",
         receding && "animate-assay-recede",
@@ -191,11 +191,12 @@ function PullCard({
           aria-pressed={selected}
           aria-label={selected ? `Deselect ${collectible.title}` : `Select ${collectible.title}`}
           className={cn(
-            "absolute right-2 top-2 grid size-6 place-items-center rounded-full transition-[background-color,transform,opacity] duration-200 active:scale-90",
+            "absolute right-1 top-1 grid size-4 place-items-center rounded-full transition-[background-color,transform,opacity] duration-200 active:scale-90 md:right-2 md:top-2 md:size-6",
+            "before:absolute before:-inset-2.5 before:content-[''] md:before:content-none",
             assaying && "opacity-0",
             selected
               ? "bg-primary text-primary-foreground"
-              : "bg-background/85 text-foreground hover:bg-background",
+              : "bg-elevated/90 text-foreground hover:bg-elevated",
           )}
         >
           {selected ? (
