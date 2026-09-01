@@ -312,6 +312,12 @@
   overflow-y: auto;
 }
 
+@utility pt-safe-* {
+  padding-top: max(calc(--value(integer) * 1px), env(safe-area-inset-top));
+}
+@utility top-safe-* {
+  top: max(calc(--value(integer) * 1px), env(safe-area-inset-top));
+}
 @utility pb-safe-* {
   padding-bottom: max(calc(--value(integer) * 1px), env(safe-area-inset-bottom));
 }

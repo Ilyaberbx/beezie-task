@@ -27,6 +27,7 @@ type DialogProps = {
 };
 
 const CONTENT_SIZED = new Set(["center", "sheet"]);
+const FULL_BLEED = new Set(["fullscreen", "video"]);
 const SCROLLS_ITS_OWN_CONTENT = "scroll-y overscroll-contain";
 
 const PANELS = {
@@ -111,7 +112,10 @@ export function Dialog({
           type="button"
           onClick={requestClose}
           aria-label="Close"
-          className="absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-md text-secondary-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          className={cn(
+            "absolute right-4 top-4 z-10 grid size-8 place-items-center rounded-md text-secondary-foreground transition-colors hover:bg-secondary hover:text-foreground",
+            FULL_BLEED.has(variant) && "top-safe-16",
+          )}
         >
           <X className="size-4.5" strokeWidth={2} />
         </button>

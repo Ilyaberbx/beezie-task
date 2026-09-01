@@ -16,7 +16,7 @@ export function PromoField({ className }: { className?: string }) {
         onClick={() => setExpanded((current) => !current)}
         aria-expanded={expanded}
         aria-controls={fieldId}
-        className="-my-3 flex w-fit items-center gap-1 py-3 text-xs font-medium leading-none text-foreground transition-colors hover:text-primary md:pointer-events-none md:hover:text-foreground"
+        className="-my-4 flex w-fit items-center gap-1 py-4 text-xs font-medium leading-none text-foreground transition-colors hover:text-primary md:pointer-events-none md:hover:text-foreground"
       >
         Apply promo code
         <ChevronDown

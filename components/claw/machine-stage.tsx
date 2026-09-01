@@ -97,7 +97,7 @@ function StageToggle({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "pointer-events-auto flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium pointer-coarse:h-10",
+        "pointer-events-auto flex h-8 items-center gap-1.5 rounded-md px-3 text-xs font-medium pointer-coarse:h-11",
         "bg-black/50 backdrop-blur-sm transition-colors",
         active ? "text-white hover:bg-black/65" : "text-secondary-foreground hover:text-white",
       )}

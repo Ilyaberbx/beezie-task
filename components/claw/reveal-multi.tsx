@@ -51,7 +51,7 @@ export function RevealMulti({
   return (
     <Dialog open={open} onClose={onClose} label="Your pulls" variant="fullscreen">
       <div className="relative flex h-full flex-col">
-        <div className="relative min-h-0 flex-1 scroll-y overscroll-contain px-4 pb-4 pt-14 md:p-8 md:pt-[66px]">
+        <div className="relative min-h-0 flex-1 scroll-y overscroll-contain px-4 pb-4 pt-[calc(3.5rem+env(safe-area-inset-top))] md:p-8 md:pt-[66px]">
           <ul className="grid grid-cols-2 gap-x-2 gap-y-2.5 md:grid-cols-4 md:gap-4">
             {pulls.map((pull, index) => (
               <PullCard
