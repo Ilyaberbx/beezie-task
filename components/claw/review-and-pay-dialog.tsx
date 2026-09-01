@@ -144,30 +144,31 @@ export function ReviewAndPayDialog({
               </div>
             </div>
 
-            <div className="hidden flex-1 flex-col gap-4 rounded-md border border-border-strong bg-secondary/40 p-4 sm:flex">
-              <div className="flex items-start gap-3">
+            <div className="hidden flex-1 flex-col gap-5 rounded-lg border border-border-strong bg-card-gradient px-4 py-5 sm:flex">
+              <div className="flex items-center gap-3">
                 <Image
                   src={machine.poster}
                   alt=""
-                  width={88}
-                  height={88}
-                  className="size-22 shrink-0 rounded-sm object-cover"
+                  width={96}
+                  height={96}
+                  className="size-24 shrink-0 rounded-md border border-border object-cover shadow-xs"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="line-clamp-2 text-xl font-semibold leading-tight text-white">
+                  <p className="line-clamp-2 text-base font-semibold leading-6 text-foreground">
                     {machine.name}
                   </p>
-                  <p className="tnum mt-1 text-sm font-medium text-secondary-foreground">
+                  <p className="tnum mt-1.5 text-xs font-medium leading-none text-secondary-foreground">
                     {currency(machine.price)}
                   </p>
                 </div>
-                <span className="tnum shrink-0 rounded-full bg-primary/15 px-2.5 py-1 text-xs font-semibold text-primary">
+                <span className="tnum shrink-0 rounded-full border border-border bg-card-gradient px-2.5 py-1.5 text-xs font-medium leading-none text-primary">
                   +{points} pts
                 </span>
               </div>
-              <SummaryRow label="Quantity" value={String(quantity)} />
-              <hr className="border-0 border-t border-dashed border-border" />
-              <SummaryRow label="Total" value={currency(total)} emphasis />
+              <div className="flex flex-col gap-3">
+                <SummaryRow label="Quantity" value={String(quantity)} />
+                <SummaryRow label="Total" value={currency(total)} emphasis />
+              </div>
             </div>
 
             {payingByCard && (
@@ -319,16 +320,16 @@ function SummaryRow({
   emphasis?: boolean;
 }) {
   return (
-    <p className="flex items-center justify-between gap-4">
-      <span className="text-sm font-medium text-secondary-foreground">{label}</span>
-      <span
-        className={cn(
-          "tnum text-sm",
-          emphasis ? "font-semibold text-white" : "font-medium text-foreground",
-        )}
-      >
-        {value}
-      </span>
+    <p
+      className={cn(
+        "flex items-center justify-between gap-4",
+        emphasis
+          ? "border-t border-dashed border-border pt-3 text-sm text-foreground"
+          : "text-xs text-secondary-foreground",
+      )}
+    >
+      <span className={emphasis ? "font-medium" : undefined}>{label}</span>
+      <span className={cn("tnum", emphasis && "font-semibold")}>{value}</span>
     </p>
   );
 }
