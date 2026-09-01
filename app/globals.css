@@ -134,14 +134,17 @@
   to { transform: translateX(400%); }
 }
 
+/* Every keyframe carries the same filter functions in the same order, so the
+   list interpolates componentwise on the compositor. Mismatched lists fall back
+   to a discrete swap: the artwork used to snap to grey two-thirds of the way in. */
 @keyframes assay-drain {
-  0% { transform: scale(1); filter: none; }
-  35% { transform: scale(1.015); filter: saturate(1.2) brightness(1.08); }
-  100% { transform: scale(0.99); filter: grayscale(0.85) brightness(0.6); }
+  0% { transform: scale(1); filter: grayscale(0) saturate(1) brightness(1); }
+  35% { transform: scale(1.015); filter: grayscale(0) saturate(1.2) brightness(1.08); }
+  100% { transform: scale(0.99); filter: grayscale(0.85) saturate(1) brightness(0.6); }
 }
 @keyframes assay-finale {
-  from { transform: scale(0.99); filter: grayscale(0.85) brightness(0.6); opacity: 1; }
-  to { transform: scale(0.93); filter: grayscale(1) brightness(0.3); opacity: 0.2; }
+  from { transform: scale(0.99); filter: grayscale(0.85) saturate(1) brightness(0.6); opacity: 1; }
+  to { transform: scale(0.93); filter: grayscale(1) saturate(1) brightness(0.3); opacity: 0.2; }
 }
 
 @keyframes assay-scan {
@@ -174,8 +177,18 @@
 }
 
 @keyframes assay-recede {
-  from { opacity: 1; filter: none; }
-  to { opacity: 0.35; filter: saturate(0.4); }
+  from { opacity: 1; }
+  to { opacity: 0.35; }
+}
+/* Reduced-motion stand-ins: the assay still reads as working, and still credits,
+   without the sweep or the travel. */
+@keyframes assay-hold {
+  0%, 100% { opacity: 0.28; }
+  50% { opacity: 0.62; }
+}
+@keyframes assay-credit-still {
+  0%, 100% { opacity: 0; }
+  20%, 70% { opacity: 1; }
 }
 @keyframes stage-in {
   from { opacity: 0; transform: scale(0.985); filter: blur(6px); }
@@ -249,14 +262,37 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Ellipse centred above the top edge: the light bows across the face instead of
+   banding flat. Percentages keep the same arc on a 200px and a 900px button. */
+:root {
+  --gold-arc: 100% 230% at 50% -34%;
+}
 @utility bg-gold-gradient {
-  background-image: linear-gradient(to bottom, #ffe082 0%, #ffca28 46%, #ffb000 100%);
+  background-image: radial-gradient(
+    var(--gold-arc),
+    #fff3c8 0%,
+    #ffe082 22%,
+    #ffca28 54%,
+    #ffb000 100%
+  );
 }
 @utility bg-gold-gradient-hover {
-  background-image: linear-gradient(to bottom, #fff0b8 0%, #ffd451 46%, #ffbe1f 100%);
+  background-image: radial-gradient(
+    var(--gold-arc),
+    #fffbe4 0%,
+    #fff0b8 22%,
+    #ffd451 54%,
+    #ffbe1f 100%
+  );
 }
 @utility bg-gold-gradient-active {
-  background-image: linear-gradient(to bottom, #ffca28 0%, #f5b800 46%, #e09a00 100%);
+  background-image: radial-gradient(
+    var(--gold-arc),
+    #ffe9a8 0%,
+    #ffca28 22%,
+    #f5b800 54%,
+    #e09a00 100%
+  );
 }
 
 @utility bg-assay-scan {
@@ -361,5 +397,19 @@
 
   [data-lift]:hover {
     translate: none !important;
+  }
+
+  /* The blanket kill above leaves the assay with nothing to show across its 1.8s.
+     Swap the sweep for a breathing wash and the rising credit for a plain fade. */
+  [data-assay-scan] {
+    bottom: 0;
+    height: auto;
+    animation: assay-hold 1400ms ease-in-out infinite !important;
+  }
+  .animate-assay-bloom {
+    display: none;
+  }
+  .animate-assay-credit {
+    animation: assay-credit-still 900ms var(--ease-out-quint) both !important;
   }
 }
