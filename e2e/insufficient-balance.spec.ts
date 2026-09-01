@@ -1,34 +1,47 @@
 import { expect, test } from "@playwright/test";
 
-// One $500 pull against the $50 external wallet.
-test("a wallet that cannot cover the order blocks Confirm until another is picked", async ({
-  page,
-}) => {
+test.beforeEach(async ({ page }) => {
   await page.goto("/claw/pokemon-gold/");
+});
+
+// The $50 external wallet cannot cover a single $500 pull.
+test("a wallet that cannot cover the order is not selectable", async ({ page }) => {
   await page.getByRole("button", { name: "Start Now" }).click();
 
   const review = page.getByRole("dialog", { name: "Review and pay" });
   await expect(review).toBeVisible();
 
-  const confirm = review.getByRole("button", { name: "Confirm" });
-  await expect(confirm).toBeEnabled();
+  const external = review.getByRole("radio", { name: /External wallet/ });
+  await expect(external).toBeDisabled();
 
-  // Two copies of the payment list ship, one per breakpoint; click the shown one.
-  await review.getByText("External wallet", { exact: true }).filter({ visible: true }).click();
-  await expect(review.getByRole("radio", { name: /External wallet/ })).toBeChecked();
+  await review
+    .getByText("External wallet", { exact: true })
+    .filter({ visible: true })
+    .click({ force: true });
+  await expect(external).not.toBeChecked();
 
-  const alert = review.getByRole("alert");
-  await expect(alert).toBeVisible();
-  await expect(alert).toContainText("$450 short in your External wallet");
-
-  await expect(confirm).toBeDisabled();
-  const describedBy = await confirm.getAttribute("aria-describedby");
-  expect(describedBy).toBeTruthy();
-  await expect(alert).toHaveAttribute("id", describedBy!);
-
-  await alert.getByRole("button", { name: "Pay with Credit / Debit" }).click();
-
+  await expect(review.getByRole("button", { name: "Confirm" })).toBeEnabled();
   await expect(review.getByRole("alert")).toHaveCount(0);
-  await expect(confirm).toBeEnabled();
-  await expect(confirm).not.toHaveAttribute("aria-describedby");
+});
+
+// Six $500 pulls outrun the $2,500 Beezie wallet the dialog opens on.
+test("outgrowing the selected wallet renames Confirm instead of explaining itself", async ({
+  page,
+}) => {
+  const increase = page.getByRole("button", { name: "Increase quantity" });
+  for (let step = 1; step < 6; step += 1) await increase.click();
+
+  await page.getByRole("button", { name: "Start Now" }).click();
+
+  const review = page.getByRole("dialog", { name: "Review and pay" });
+  await expect(review).toBeVisible();
+  await expect(review.getByRole("radio", { name: /Beezie wallet/ })).toBeDisabled();
+
+  const blocked = review.getByRole("button", { name: "Not enough balance" });
+  await expect(blocked).toBeVisible();
+  await expect(blocked).toBeDisabled();
+  await expect(review.getByRole("alert")).toHaveCount(0);
+
+  await review.getByText("Credit / Debit", { exact: true }).filter({ visible: true }).click();
+  await expect(review.getByRole("button", { name: "Confirm" })).toBeEnabled();
 });

@@ -4,8 +4,6 @@ import Image from "next/image";
 import { asset } from "@/lib/asset";
 import { cn } from "@/lib/cn";
 import { currency } from "@/lib/format";
-import { useId } from "react";
-import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { orderTotals, type Affordability } from "@/lib/claw/session";
@@ -25,7 +23,6 @@ type ReviewAndPayDialogProps = {
   selectedMethodId: PaymentMethodId;
   onSelectMethod: (id: PaymentMethodId) => void;
   affordability: Affordability;
-  onReduceQuantity: (next: number) => void;
   onConfirm: () => void;
   onClose: () => void;
 };
@@ -38,17 +35,12 @@ export function ReviewAndPayDialog({
   selectedMethodId,
   onSelectMethod,
   affordability,
-  onReduceQuantity,
   onConfirm,
   onClose,
 }: ReviewAndPayDialogProps) {
   const { total, points } = orderTotals(machine, quantity);
-  const alertId = useId();
   const payingByCard = selectedMethodId === "card";
   const wallets = methods.filter((method) => method.id !== "card");
-  const canReduce =
-    affordability.affordableQuantity >= 1 &&
-    affordability.affordableQuantity < quantity;
 
   return (
     <Dialog
@@ -174,6 +166,7 @@ export function ReviewAndPayDialog({
                     key={wallet.id}
                     method={wallet}
                     checked={wallet.id === selectedMethodId}
+                    short={shortfallFor(wallet.balance, total) > 0}
                     onSelect={() => onSelectMethod(wallet.id)}
                   />
                 ))}
@@ -182,40 +175,12 @@ export function ReviewAndPayDialog({
           )}
         </div>
 
-        {!affordability.canAfford && (
-          <Alert
-            id={alertId}
-            title={`${currency(affordability.shortfall)} short in your ${affordability.methodLabel}`}
-            actions={
-              <>
-                {canReduce && (
-                  <Button
-                    variant="outline"
-                    className="px-3 text-xs [&]:h-8"
-                    onClick={() => onReduceQuantity(affordability.affordableQuantity)}
-                  >
-                    Reduce to {affordability.affordableQuantity}
-                  </Button>
-                )}
-                <Button
-                  variant="outline"
-                  className="px-3 text-xs [&]:h-8"
-                  onClick={() => onSelectMethod("card")}
-                >
-                  Pay with Credit / Debit
-                </Button>
-              </>
-            }
-          />
-        )}
-
         <Button
-          className="w-full [&]:rounded-[10px] sm:mx-auto sm:h-9 sm:w-[328px]"
+          className="w-full [&]:rounded-[10px] sm:mx-auto sm:w-[328px] sm:[&]:h-9"
           onClick={onConfirm}
           disabled={!affordability.canAfford}
-          aria-describedby={affordability.canAfford ? undefined : alertId}
         >
-          Confirm
+          {affordability.canAfford ? "Confirm" : "Not enough balance"}
         </Button>
       </div>
     </Dialog>
@@ -237,23 +202,27 @@ function SlidingTabPill({ shifted }: { shifted: boolean }) {
 function WalletOption({
   method,
   checked,
+  short,
   onSelect,
 }: {
   method: PaymentMethod;
   checked: boolean;
+  short: boolean;
   onSelect: () => void;
 }) {
   return (
     <label
       className={cn(
-        "flex min-w-0 cursor-pointer flex-col gap-1 rounded-lg border bg-secondary/40 px-3 py-2.5 transition-[background-color,border-color,scale] active:scale-[0.985]",
+        "flex min-w-0 flex-col gap-1 rounded-lg border bg-secondary/40 px-3 py-2.5 transition-[background-color,border-color,scale]",
         checked ? "border-primary" : "border-border-strong",
+        short ? "cursor-not-allowed opacity-45" : "cursor-pointer active:scale-[0.985]",
       )}
     >
       <input
         type="radio"
         name="wallet"
         checked={checked}
+        disabled={short}
         onChange={onSelect}
         className="sr-only"
       />
@@ -340,16 +309,20 @@ function PaymentRow({
   return (
     <label
       className={cn(
-        "flex min-h-[58px] cursor-pointer items-center gap-3 rounded-lg bg-secondary/40 px-4 py-3 transition-[background-color,border-color,scale] active:scale-[0.995]",
+        "flex min-h-[58px] items-center gap-3 rounded-lg bg-secondary/40 px-4 py-3 transition-[background-color,border-color,scale]",
         checked
           ? "border-2 border-primary"
-          : "border border-border-strong hover:bg-secondary/70",
+          : "border border-border-strong",
+        shortfall > 0
+          ? "cursor-not-allowed opacity-45"
+          : "cursor-pointer active:scale-[0.995] hover:bg-secondary/70",
       )}
     >
       <input
         type="radio"
         name="payment-method"
         checked={checked}
+        disabled={shortfall > 0}
         onChange={onSelect}
         className="sr-only"
       />

@@ -18,8 +18,6 @@ export type Affordability = {
   total: number;
   shortfall: number;
   canAfford: boolean;
-  affordableQuantity: number;
-  methodLabel: string;
 };
 
 export type AffordabilityInput = {
@@ -27,7 +25,6 @@ export type AffordabilityInput = {
   quantity: number;
   method: PaymentMethod | undefined;
   balanceError: { shortfall: number } | null;
-  maxQuantity: number;
 };
 
 export function clampQuantity(n: number, max: number) {
@@ -46,20 +43,14 @@ export function computeAffordability({
   quantity,
   method,
   balanceError,
-  maxQuantity,
 }: AffordabilityInput): Affordability {
   const total = price * quantity;
-  const methodBalance = method?.balance;
-  const shortfall = shortfallFor(methodBalance, total);
-  const affordableQuantity =
-    methodBalance === undefined ? maxQuantity : Math.floor(methodBalance / price);
+  const shortfall = shortfallFor(method?.balance, total);
 
   return {
     total,
     shortfall: balanceError?.shortfall ?? shortfall,
     canAfford: shortfall === 0 && balanceError === null,
-    affordableQuantity: Math.min(maxQuantity, affordableQuantity),
-    methodLabel: method?.label ?? "this method",
   };
 }
 

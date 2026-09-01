@@ -139,7 +139,6 @@ export function usePullSession(slug: string) {
         quantity,
         method: paymentMethods.find((method) => method.id === paymentMethodId),
         balanceError,
-        maxQuantity: MAX_QUANTITY,
       }),
     [machine.price, quantity, paymentMethods, paymentMethodId, balanceError],
   );
@@ -149,11 +148,6 @@ export function usePullSession(slug: string) {
   const adjustQuantity = useCallback((delta: number) => {
     setBalanceError(null);
     setQuantity((current) => clampQuantity(current + delta, MAX_QUANTITY));
-  }, []);
-
-  const setQuantityTo = useCallback((next: number) => {
-    setBalanceError(null);
-    setQuantity(clampQuantity(next, MAX_QUANTITY));
   }, []);
 
   const selectPaymentMethod = useCallback((id: PaymentMethodId) => {
@@ -196,7 +190,6 @@ export function usePullSession(slug: string) {
     paymentMethods,
     quantity,
     adjustQuantity,
-    setQuantityTo,
     maxQuantity: MAX_QUANTITY,
     stage,
     paymentMethodId,

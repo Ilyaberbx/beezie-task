@@ -69,7 +69,6 @@ export function ClawExperience({ slug }: { slug: string }) {
             selectedMethodId={session.paymentMethodId}
             onSelectMethod={session.setPaymentMethodId}
             affordability={session.affordability}
-            onReduceQuantity={session.setQuantityTo}
             onConfirm={session.confirmPurchase}
             onClose={session.cancelReview}
           />
