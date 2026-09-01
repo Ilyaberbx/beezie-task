@@ -25,6 +25,14 @@ type DialogProps = {
 };
 
 const EXIT_MS = 180;
+const MORPH_MS = 320;
+/** How long a closing panel's box stays available to the next one to grow from. */
+const HANDOFF_MS = 500;
+const MORPH_EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+/** Only content-sized panels morph; fullscreen and video are viewport-fixed. */
+const MORPHABLE = new Set(["center", "sheet"]);
+
+type Box = { w: number; h: number };
 
 type DialogPhase = "open" | "closing";
 
@@ -33,6 +41,36 @@ const listeners = new Set<() => void>();
 
 let version = 0;
 let anyOpen = false;
+let waiting = 0;
+let handoff: (Box & { at: number }) | null = null;
+
+function setWaiting(delta: number) {
+  waiting += delta;
+  version += 1;
+  for (const listener of listeners) listener();
+}
+
+/** Grow or shrink the panel between two boxes, clipping its content meanwhile. */
+function morphBox(el: HTMLElement, from: Box, to: Box) {
+  const previousOverflow = el.style.overflow;
+  el.style.overflow = "hidden";
+  // max-width is what actually sizes these panels, so it has to travel too —
+  // animating width alone just gets clamped back to the incoming panel's cap.
+  const animation = el.animate(
+    [
+      { width: `${from.w}px`, maxWidth: `${from.w}px`, height: `${from.h}px` },
+      { width: `${to.w}px`, maxWidth: `${to.w}px`, height: `${to.h}px` },
+    ],
+    { duration: MORPH_MS, easing: MORPH_EASE },
+  );
+  const restore = () => {
+    el.style.overflow = previousOverflow;
+  };
+  animation.finished.then(restore, restore);
+  return animation;
+}
+
+const measure = (el: HTMLElement): Box => ({ w: el.offsetWidth, h: el.offsetHeight });
 
 function publish(id: symbol, phase: DialogPhase | null) {
   if (phase === null) {
@@ -60,6 +98,7 @@ function hasOtherDialog(id: symbol) {
 
 const getVersion = () => version;
 const getAnyOpen = () => anyOpen;
+const getWaiting = () => waiting;
 const serverVersion = () => 0;
 const serverClosed = () => false;
 
@@ -102,9 +141,13 @@ export function Dialog({
   const [id] = useState(() => Symbol("dialog"));
   const [closing, setClosing] = useState(false);
   const reduceMotion = usePrefersReducedMotion();
+  const box = useRef<Box | null>(null);
+  const morphing = useRef(false);
 
   useSyncExternalStore(subscribe, getVersion, serverVersion);
+  const queued = useSyncExternalStore(subscribe, getWaiting, serverVersion);
   const hasOther = hasOtherDialog(id);
+  const morphable = MORPHABLE.has(variant) && !reduceMotion;
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -118,24 +161,91 @@ export function Dialog({
       dialog.showModal();
       dialog.focus();
       onOpenedRef.current?.();
+
+      const from = handoff;
+      handoff = null;
+      const to = measure(dialog);
+      box.current = to;
+
+      const continues =
+        morphable &&
+        from !== null &&
+        performance.now() - from.at < HANDOFF_MS &&
+        (Math.abs(to.w - from.w) > 1 || Math.abs(to.h - from.h) > 1);
+
+      if (continues && from) {
+        // The entrance keyframes would fight the morph over the same box.
+        for (const animation of dialog.getAnimations()) animation.cancel();
+        morphing.current = true;
+        const settle = () => {
+          morphing.current = false;
+          box.current = measure(dialog);
+        };
+        morphBox(dialog, from, to).finished.then(settle, settle);
+        // The shell carries over; its contents are what actually changed.
+        for (const child of Array.from(dialog.children)) {
+          child.animate([{ opacity: 0 }, { opacity: 1 }], {
+            duration: 220,
+            delay: 90,
+            easing: MORPH_EASE,
+            fill: "backwards",
+          });
+        }
+      }
     }
     if (open && dialog.open && !closing) publish(id, "open");
     if (!open && dialog.open && !closing) setClosing(true);
-  }, [open, hasOther, closing, id]);
+  }, [open, hasOther, closing, id, morphable]);
+
+  // Announce that this dialog is blocked, so whatever holds the slot can hand it over.
+  useEffect(() => {
+    if (!open || !hasOther) return;
+    setWaiting(1);
+    return () => setWaiting(-1);
+  }, [open, hasOther]);
 
   useEffect(() => {
     if (!closing) return;
     publish(id, "closing");
+    // Something is waiting: hand the slot over now rather than playing an exit
+    // it would only sit through.
+    const handover = queued > 0 && morphable;
     const timer = window.setTimeout(
       () => {
-        ref.current?.close();
+        const dialog = ref.current;
+        if (dialog && handover) {
+          handoff = { ...measure(dialog), at: performance.now() };
+        }
+        dialog?.close();
         publish(id, null);
         setClosing(false);
       },
-      reduceMotion ? 0 : EXIT_MS,
+      reduceMotion || handover ? 0 : EXIT_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [closing, reduceMotion, id]);
+  }, [closing, reduceMotion, id, queued, morphable]);
+
+  // A panel whose own content changes size resizes to match instead of snapping.
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog || !open || closing || !morphable) return;
+
+    const observer = new ResizeObserver(() => {
+      if (morphing.current) return;
+      const from = box.current;
+      const to = measure(dialog);
+      box.current = to;
+      if (!from || (Math.abs(to.w - from.w) < 2 && Math.abs(to.h - from.h) < 2)) return;
+      morphing.current = true;
+      const settle = () => {
+        morphing.current = false;
+        box.current = measure(dialog);
+      };
+      morphBox(dialog, from, to).finished.then(settle, settle);
+    });
+    observer.observe(dialog);
+    return () => observer.disconnect();
+  }, [open, closing, morphable]);
 
   useEffect(() => () => publish(id, null), [id]);
 
