@@ -4,12 +4,17 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { useImagePreload } from "@/hooks/claw/use-image-preload";
 import { usePullSession } from "@/hooks/claw/use-pull-session";
 import { useRevealPreload } from "@/hooks/claw/use-reveal-preload";
 import { useMounted } from "@/hooks/use-mounted";
+import { thumb } from "@/lib/asset";
+import { COLLECTIBLES } from "@/lib/claw/mock";
 import { clawQueries } from "@/lib/claw/queries";
 import { isPendingStage, isResultStage } from "@/lib/claw/session";
 import { PurchaseBar } from "./purchase-bar";
+
+const CATALOGUE_THUMBS = COLLECTIBLES.map((collectible) => thumb(collectible.image));
 
 const PendingDialog = dynamic(() => import("./pending-dialog").then((m) => m.PendingDialog));
 const ReviewAndPayDialog = dynamic(() =>
@@ -28,6 +33,9 @@ export function ClawExperience({ slug }: { slug: string }) {
   const [engaged, setEngaged] = useState(false);
   const { source, isBuffered, prefersReducedMotion } = useRevealPreload(engaged);
   const mounted = useMounted();
+
+  useImagePreload(CATALOGUE_THUMBS);
+  useImagePreload(session.pulls.map((pull) => pull.collectible.image));
 
   const revealReady = isBuffered || prefersReducedMotion;
   const isPending = isPendingStage(session.stage, revealReady);
