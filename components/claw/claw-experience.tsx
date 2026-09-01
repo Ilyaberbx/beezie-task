@@ -25,8 +25,8 @@ const SwapSuccessDialog = dynamic(() =>
 export function ClawExperience({ slug }: { slug: string }) {
   const session = usePullSession(slug);
   const { data: prizeHighlights } = useSuspenseQuery(clawQueries.prizeHighlights());
-  const { source, isBuffered, prefersReducedMotion } = useRevealPreload();
   const [engaged, setEngaged] = useState(false);
+  const { source, isBuffered, prefersReducedMotion } = useRevealPreload(engaged);
   const mounted = useMounted();
 
   const revealReady = isBuffered || prefersReducedMotion;

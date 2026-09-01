@@ -13,6 +13,7 @@ export function MoreMachines({ machines }: { machines: MachineSummary[] }) {
         {machines.map((machine) => (
           <li key={machine.slug}>
             <Link
+              prefetch={false}
               href={`/claw/${machine.slug}`}
               data-lift
               className="flex h-full flex-col items-center justify-center gap-1.5 rounded-lg border border-border-strong bg-secondary px-2 py-2.5 text-center shadow-tile transition-[background-color,border-color,box-shadow,translate] hover:-translate-y-px hover:border-primary/50 hover:bg-elevated hover:shadow-tile-raised active:translate-y-0 md:gap-2 md:px-4 md:py-4"

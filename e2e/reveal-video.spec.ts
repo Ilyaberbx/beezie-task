@@ -84,3 +84,41 @@ test("every handoff between dialogs keeps a panel on screen", async ({ page }) =
 
   expect(longestGap).toBeLessThanOrEqual(1);
 });
+
+test("the video rises from black and returns to it before the handover", async ({ page }) => {
+  test.slow();
+
+  await page.addInitScript(() => {
+    const samples: number[] = [];
+    Object.assign(window, { __opacity: samples });
+    const tick = () => {
+      const video = document.querySelector<HTMLVideoElement>(
+        'dialog[open][aria-label="Revealing your pull"] video',
+      );
+      if (video) samples.push(Number(getComputedStyle(video).opacity));
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+
+  await page.goto("/claw/pokemon-gold/");
+  await page.getByRole("button", { name: "Start Now" }).click();
+
+  const review = page.getByRole("dialog", { name: "Review and pay" });
+  await expect(review).toBeVisible();
+  await review.getByRole("button", { name: "Confirm" }).click();
+
+  await expect(page.getByRole("dialog", { name: "Your pull", exact: true })).toBeVisible({
+    timeout: 60_000,
+  });
+
+  const samples = await page.evaluate(
+    () => (window as { __opacity?: number[] }).__opacity ?? [],
+  );
+  expect(samples.length).toBeGreaterThan(30);
+
+  // Opens on black, reaches the picture, and is back to black at the handover.
+  expect(samples[0]).toBeLessThan(0.1);
+  expect(Math.max(...samples)).toBeGreaterThan(0.95);
+  expect(samples.at(-1)).toBeLessThan(0.5);
+});

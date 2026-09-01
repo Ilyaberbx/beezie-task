@@ -7,14 +7,14 @@ import { useMediaQuery, usePrefersReducedMotion } from "@/hooks/use-media-query"
 const DESKTOP = "(min-width: 768px)";
 const BUFFER_CEILING_MS = 6000;
 
-export function useRevealPreload() {
+export function useRevealPreload(enabled: boolean) {
   const isDesktop = useMediaQuery(DESKTOP, true);
   const prefersReducedMotion = usePrefersReducedMotion();
   const source = isDesktop ? asset("/media/reveal-web.mp4") : asset("/media/reveal-mobile.mp4");
   const [bufferedSource, setBufferedSource] = useState<string | null>(null);
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion || !enabled) return;
 
     const warmup = document.createElement("video");
     const releaseSecondDecoderAndRangeRequest = () => {
@@ -40,7 +40,7 @@ export function useRevealPreload() {
       warmup.removeEventListener("canplaythrough", markBuffered);
       releaseSecondDecoderAndRangeRequest();
     };
-  }, [source, prefersReducedMotion]);
+  }, [source, prefersReducedMotion, enabled]);
 
   return {
     source,
