@@ -4,10 +4,11 @@ import Image from "next/image";
 import { Check, Info, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { thumb } from "@/lib/asset";
 import { cn } from "@/lib/cn";
 import { currency, splitDuration } from "@/lib/format";
 import { isSwapWindowExpired, swapButtonLabel } from "@/lib/claw/session";
-import { useCountdown } from "@/hooks/claw/use-countdown";
+import { useCountdown, useDeadlinePassed } from "@/hooks/claw/use-countdown";
 import { assaySweepDelayMs } from "@/lib/ui/stagger";
 import { SwapAssay } from "./swap-assay";
 import type { Pull } from "@/lib/claw/types";
@@ -43,10 +44,8 @@ export function RevealMulti({
   onSwapOne,
   onClose,
 }: RevealMultiProps) {
-  const remainingMs = useCountdown(open ? expiresAt : null);
-  const { minutes, seconds } = splitDuration(remainingMs ?? 0);
   const allSelected = selectedIds.length === pulls.length && pulls.length > 0;
-  const expired = isSwapWindowExpired(remainingMs);
+  const expired = useDeadlinePassed(open ? expiresAt : null);
   const locked = isSwapping || expired;
 
   return (
@@ -73,18 +72,7 @@ export function RevealMulti({
 
         <div className="relative flex shrink-0 flex-col gap-3 border-t border-border bg-card px-4 py-3 pb-safe-12 md:flex-row md:items-center md:gap-6 md:px-8 md:py-4 md:pb-4">
           <div className="flex items-center justify-between gap-4 md:contents">
-            <p className="text-xs font-medium text-secondary-foreground md:text-sm">
-              {expired ? (
-                <span className="text-foreground">Swap window closed</span>
-              ) : (
-                <>
-                  Expires in:{" "}
-                  <span className="tnum text-foreground">
-                    {minutes} min {String(seconds).padStart(2, "0")} sec
-                  </span>
-                </>
-              )}
-            </p>
+            <SwapWindow expiresAt={open ? expiresAt : null} />
             <button
               type="button"
               onClick={onToggleAll}
@@ -117,6 +105,27 @@ export function RevealMulti({
         </div>
       </div>
     </Dialog>
+  );
+}
+
+/** Owns the once-a-second tick so it stays off the card grid, which is mid-assay. */
+function SwapWindow({ expiresAt }: { expiresAt: number | null }) {
+  const remainingMs = useCountdown(expiresAt);
+  const { minutes, seconds } = splitDuration(remainingMs ?? 0);
+
+  return (
+    <p className="text-xs font-medium text-secondary-foreground md:text-sm">
+      {isSwapWindowExpired(remainingMs) ? (
+        <span className="text-foreground">Swap window closed</span>
+      ) : (
+        <>
+          Expires in:{" "}
+          <span className="tnum text-foreground">
+            {minutes} min {String(seconds).padStart(2, "0")} sec
+          </span>
+        </>
+      )}
+    </p>
   );
 }
 
@@ -159,7 +168,7 @@ function PullCard({
         )}
       >
         <Image
-          src={collectible.image}
+          src={thumb(collectible.image)}
           alt={collectible.title}
           fill
           sizes="(min-width: 768px) 260px, 45vw"

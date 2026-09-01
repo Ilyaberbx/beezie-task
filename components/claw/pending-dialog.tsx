@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { thumb } from "@/lib/asset";
 import { cn } from "@/lib/cn";
 import { currency } from "@/lib/format";
 import { Dialog } from "@/components/ui/dialog";
@@ -36,7 +37,7 @@ export function PendingDialog({
         <div className="relative aspect-square w-full max-w-[220px] overflow-hidden rounded-md bg-white">
           <Image
             key={preview.id}
-            src={preview.image}
+            src={thumb(preview.image)}
             alt={preview.title}
             fill
             sizes="220px"

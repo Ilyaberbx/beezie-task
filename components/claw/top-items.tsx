@@ -1,4 +1,5 @@
 import { FadeImage } from "@/components/ui/fade-image";
+import { thumb } from "@/lib/asset";
 import { currency } from "@/lib/format";
 import { SectionPanel } from "./section-panel";
 import { Separator } from "@/components/ui/separator";
@@ -17,7 +18,7 @@ export function TopItems({ items }: { items: TopItem[] }) {
           >
             <div className="relative aspect-square w-full overflow-hidden rounded-md bg-white">
               <FadeImage
-                src={item.image}
+                src={thumb(item.image)}
                 alt={item.title}
                 fill
                 sizes="(min-width: 1024px) 200px, 45vw"

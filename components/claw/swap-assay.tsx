@@ -59,8 +59,9 @@ export function SwapAssay({
         </>
       ) : (
         <span
+          data-assay-scan
           style={{ animationDelay: `${delayMs}ms` }}
-          className="absolute inset-x-0 top-0 h-[26%] animate-assay-scan bg-assay-scan blur-[0.5px]"
+          className="absolute inset-x-0 top-0 h-[26%] animate-assay-scan bg-assay-scan"
         />
       )}
     </span>

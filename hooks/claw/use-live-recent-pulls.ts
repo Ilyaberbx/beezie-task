@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useSyncExternalStore } from "react";
+import { useAnyDialogOpen } from "@/components/ui/dialog";
 import { usePrefersReducedMotion } from "@/hooks/use-media-query";
 import { drawRecentPull } from "@/lib/claw/mock";
 import { insertLivePull, settleLivePull, trimLivePulls } from "@/lib/claw/live-pulls";
@@ -28,6 +29,7 @@ export function useLiveRecentPulls(
 ) {
   seedLivePulls(initial);
   const prefersReducedMotion = usePrefersReducedMotion();
+  const dialogCoversTheFeed = useAnyDialogOpen();
 
   useEffect(() => {
     const exitMs = prefersReducedMotion ? REDUCED_EXIT_MS : EXIT_MS;
@@ -52,8 +54,10 @@ export function useLiveRecentPulls(
       timers.add(settle);
     };
 
+    // Rows animate grid-template-rows, which lays out every frame. Nobody can see
+    // them under a dialog, so don't spend the main thread the assay is animating on.
     const sync = () => {
-      if (document.visibilityState === "visible") {
+      if (document.visibilityState === "visible" && !dialogCoversTheFeed) {
         unsubscribe ??= feed.subscribe(receive);
       } else {
         unsubscribe?.();
@@ -70,7 +74,7 @@ export function useLiveRecentPulls(
       for (const timer of timers) clearTimeout(timer);
       timers.clear();
     };
-  }, [feed, prefersReducedMotion]);
+  }, [feed, prefersReducedMotion, dialogCoversTheFeed]);
 
   return useSyncExternalStore(
     livePullsStore.subscribe,

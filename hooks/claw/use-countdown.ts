@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 let sharedNow = 0;
 
@@ -23,4 +23,15 @@ export function useCountdown(expiresAt: number | null): number | null {
 
   if (expiresAt === null || now === 0) return null;
   return Math.max(0, expiresAt - now);
+}
+
+/** Ticks once, at the deadline. A boolean snapshot lets useSyncExternalStore bail
+ *  out of the other 1/s renders, so the countdown never reconciles the card grid. */
+export function useDeadlinePassed(expiresAt: number | null): boolean {
+  const getSnapshot = useCallback(
+    () => expiresAt !== null && sharedNow !== 0 && sharedNow >= expiresAt,
+    [expiresAt],
+  );
+
+  return useSyncExternalStore(subscribeToSeconds, getSnapshot, () => false);
 }

@@ -404,6 +404,9 @@
   [data-assay-scan] {
     bottom: 0;
     height: auto;
+    /* The sweep gradient is directional; stretched full-height it pins a bright
+       band to the bottom edge. A centred glow reads as working from any angle. */
+    background-image: radial-gradient(circle at center, #ffca2840 0%, #ffca2800 68%);
     animation: assay-hold 1400ms ease-in-out infinite !important;
   }
   .animate-assay-bloom {

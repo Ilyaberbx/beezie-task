@@ -1,6 +1,7 @@
 "use client";
 
 import { FadeImage } from "@/components/ui/fade-image";
+import { thumb } from "@/lib/asset";
 import { currency } from "@/lib/format";
 import { useLiveRecentPulls } from "@/hooks/claw/use-live-recent-pulls";
 import { livePullRowState } from "@/lib/claw/live-pulls";
@@ -24,7 +25,7 @@ export function LivePullList({ initial }: { initial: RecentPull[] }) {
             >
               <div className="relative size-16 shrink-0 overflow-hidden rounded-sm bg-white @[26rem]:size-21">
                 <FadeImage
-                  src={pull.image}
+                  src={thumb(pull.image)}
                   alt={pull.title}
                   fill
                   sizes="84px"
