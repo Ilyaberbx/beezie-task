@@ -17,7 +17,18 @@ export function useRevealPreload() {
     if (prefersReducedMotion) return;
 
     const warmup = document.createElement("video");
-    const markBuffered = () => setBufferedSource(source);
+    // Once the file is in the HTTP cache this element has done its job. Leaving
+    // it live keeps a second decoder and a second range request open against the
+    // same file the overlay is about to play — on a phone that is exactly the
+    // contention that makes the reveal stall.
+    const release = () => {
+      warmup.removeAttribute("src");
+      warmup.load();
+    };
+    const markBuffered = () => {
+      setBufferedSource(source);
+      release();
+    };
 
     warmup.preload = "auto";
     warmup.muted = true;
@@ -31,8 +42,7 @@ export function useRevealPreload() {
     return () => {
       window.clearTimeout(ceiling);
       warmup.removeEventListener("canplaythrough", markBuffered);
-      warmup.removeAttribute("src");
-      warmup.load();
+      release();
     };
   }, [source, prefersReducedMotion]);
 

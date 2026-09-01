@@ -2,6 +2,7 @@
 
 import { Sparkles, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useAnyDialogOpen } from "@/components/ui/dialog";
 import { markStageReady } from "@/hooks/claw/use-stage-ready";
 import { useSoundPreference } from "@/hooks/claw/use-sound-preference";
 import { cn } from "@/lib/cn";
@@ -17,23 +18,27 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
   const [soundOn, setSoundOn] = useSoundPreference();
   const [animationOn, setAnimationOn] = useState(true);
   const [ready, setReady] = useState(false);
+  // Nothing behind a modal is visible, and a phone has very few video decoders
+  // to go around — a loop still running under the reveal is what starves it.
+  const dialogOpen = useAnyDialogOpen();
+  const playing = animationOn && !dialogOpen;
 
   useEffect(() => {
     const element = videoRef.current;
     if (!element) return;
     element.muted = !soundOn;
-    if (soundOn && element.paused && animationOn) void element.play().catch(() => undefined);
-  }, [soundOn, animationOn]);
+    if (soundOn && element.paused && playing) void element.play().catch(() => undefined);
+  }, [soundOn, playing]);
 
   useEffect(() => {
     const element = videoRef.current;
     if (!element) return;
-    if (animationOn) {
+    if (playing) {
       void element.play().catch(() => undefined);
     } else {
       element.pause();
     }
-  }, [animationOn]);
+  }, [playing]);
 
   // A cached video can already be playable before this component mounts.
   useEffect(() => {

@@ -5,7 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { useSoundPreference } from "@/hooks/claw/use-sound-preference";
 
-const MAX_WAIT_MS = 4000;
+/** How long the picture may sit on one frame before we hand over the result. */
+const STALL_MS = 1500;
 
 type RevealOverlayProps = {
   open: boolean;
@@ -43,27 +44,29 @@ export function RevealOverlay({
   }, [open]);
 
   useEffect(() => {
-    if (openings === 0) return;
+    if (!open || openings === 0) return;
 
     const element = videoRef.current;
-    let started = false;
-    const play = () =>
-      element?.play().then(() => {
-        started = true;
-      });
+    if (!element) return;
 
-    void play()?.catch(() => {
-      if (!element) return onFinish();
+    const play = () => element.play();
+    void play().catch(() => {
       element.muted = true;
-      return play()?.catch(() => onFinish());
+      return play().catch(onFinish);
     });
 
-    const bailout = window.setTimeout(() => {
-      if (!started) onFinish();
-    }, MAX_WAIT_MS);
+    // One watchdog for the whole playback, not just its start. A reveal that
+    // never gets a decoder and one that stalls mid-frame look identical from
+    // here, and this overlay has no way out — if the picture stops moving,
+    // give the user their result rather than a still they cannot dismiss.
+    let last = -1;
+    const watchdog = window.setInterval(() => {
+      if (element.currentTime === last) return onFinish();
+      last = element.currentTime;
+    }, STALL_MS);
 
-    return () => window.clearTimeout(bailout);
-  }, [openings, onFinish]);
+    return () => window.clearInterval(watchdog);
+  }, [open, openings, onFinish]);
 
   if (skipAnimation) return null;
 

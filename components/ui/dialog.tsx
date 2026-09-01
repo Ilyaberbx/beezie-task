@@ -102,8 +102,13 @@ const getWaiting = () => waiting;
 const serverVersion = () => 0;
 const serverClosed = () => false;
 
+/** Is any dialog on screen? Lets the page quiet down behind the scrim. */
+export function useAnyDialogOpen() {
+  return useSyncExternalStore(subscribe, getAnyOpen, serverClosed);
+}
+
 export function DialogScrim() {
-  const open = useSyncExternalStore(subscribe, getAnyOpen, serverClosed);
+  const open = useAnyDialogOpen();
 
   return (
     <div
