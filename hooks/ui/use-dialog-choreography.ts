@@ -15,6 +15,7 @@ import {
   type Box,
 } from "@/lib/ui/box";
 import {
+  EXIT_MS,
   MORPH_EASE,
   morphBox,
   stopMorph,
@@ -30,7 +31,11 @@ import {
   type Handoff,
 } from "@/lib/ui/dialog-registry";
 
-const EXIT_MS = 180;
+/**
+ * A handoff between two dialogs is worth animating at a pixel; a sheet resizing
+ * under its own content is not. Below this the panel just adopts the new box.
+ */
+const RESIZE_EPSILON_PX = 12;
 
 const useBeforePaint = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -135,7 +140,7 @@ export function useDialogChoreography({
       const from = box.current;
       const to = measureBox(dialog);
       box.current = to;
-      if (!from || !boxesDiffer(to, from, MORPH_EPSILON_PX)) return;
+      if (!from || !boxesDiffer(to, from, RESIZE_EPSILON_PX)) return;
       if (viewportIsStillSettling()) return;
       const settle = () => {
         box.current = measureBox(dialog);

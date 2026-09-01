@@ -41,6 +41,7 @@
     0 14px 26px -10px #00000080;
 
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-quint: cubic-bezier(0.32, 0, 0.67, 0);
 
   --ease-draw: cubic-bezier(0.65, 0, 0.35, 1);
   --default-transition-duration: 150ms;
@@ -48,8 +49,9 @@
   --animate-sheet-in: sheet-in 320ms var(--ease-out-quint);
   --animate-dialog-in: dialog-in 220ms var(--ease-out-quint);
   --animate-fade-in: fade-in 240ms var(--ease-out-quint);
-  --animate-sheet-out: sheet-out 180ms var(--ease-out-quint) forwards;
-  --animate-dialog-out: dialog-out 180ms var(--ease-out-quint) forwards;
+  /* 260ms mirrors EXIT_MS in lib/ui/dialog-morph.ts; keep the two in step. */
+  --animate-sheet-out: sheet-out 260ms var(--ease-in-quint) forwards;
+  --animate-dialog-out: dialog-out 260ms var(--ease-in-quint) forwards;
   --animate-fade-out: fade-out 180ms var(--ease-out-quint) forwards;
   --animate-spin-slow: spin 1.6s linear infinite;
   --animate-pull-in: pull-in 460ms var(--ease-out-quint);
@@ -88,8 +90,9 @@
   to { opacity: 1; }
 }
 @keyframes sheet-out {
-  from { transform: translateY(0); }
-  to { transform: translateY(100%); }
+  from { transform: translateY(0); opacity: 1; }
+  65% { opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
 }
 @keyframes dialog-out {
   from { opacity: 1; transform: scale(1) translateY(0); }

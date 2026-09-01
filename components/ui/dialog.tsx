@@ -52,7 +52,7 @@ export function DialogScrim() {
     <div
       aria-hidden
       data-open={open || undefined}
-      className="pointer-events-none fixed inset-0 z-50 bg-black/72 opacity-0 transition-opacity duration-200 data-[open]:opacity-100"
+      className="pointer-events-none fixed inset-0 z-50 bg-black/72 opacity-0 transition-opacity duration-[260ms] ease-in-quint data-[open]:opacity-100 data-[open]:duration-200 data-[open]:ease-out-quint"
     />
   );
 }

@@ -55,7 +55,8 @@ export function ReviewAndPayDialog({
 
         <div className="grid gap-5 sm:grid-cols-2 sm:gap-6">
           <fieldset className="flex min-w-0 flex-col gap-2">
-            <legend className="mb-3 text-sm font-semibold text-foreground">
+            {/* The two-tab control names itself on mobile; desktop's list needs the heading. */}
+            <legend className="sr-only text-sm font-semibold text-foreground sm:not-sr-only sm:mb-3">
               Pay with
             </legend>
 
