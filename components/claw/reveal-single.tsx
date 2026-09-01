@@ -3,8 +3,10 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { cn } from "@/lib/cn";
 import { currency } from "@/lib/format";
 import { Confetti } from "./confetti";
+import { SwapAssay } from "./swap-assay";
 import type { Pull } from "@/lib/claw/types";
 
 type RevealSingleProps = {
@@ -30,18 +32,33 @@ export function RevealSingle({
         <Confetti />
 
         <div className="relative grid flex-1 content-start gap-6 p-4 pt-12 md:grid-cols-2 md:content-center md:items-center md:gap-12 md:p-12">
-          <div className="relative aspect-square w-full overflow-hidden rounded-xl bg-white shadow-card md:justify-self-end md:max-w-[500px]">
+          <div
+            className={cn(
+              "relative aspect-square w-full overflow-hidden rounded-xl shadow-card transition-colors duration-500 md:justify-self-end md:max-w-[500px]",
+              // The artwork drains away; it has to dissolve into the dark, not into the frame's white.
+              isSwapping ? "bg-elevated" : "bg-white",
+            )}
+          >
             <Image
               src={collectible.image}
               alt={collectible.title}
               fill
               priority
               sizes="(min-width: 768px) 500px, 90vw"
-              className="animate-fade-in object-cover"
+              className={cn(
+                "object-cover",
+                isSwapping ? "animate-assay-card" : "animate-fade-in",
+              )}
             />
+            {isSwapping && <SwapAssay value={collectible.swapValue} />}
           </div>
 
-          <div className="flex flex-col gap-6 md:max-w-[446px]">
+          <div
+            className={cn(
+              "flex flex-col gap-6 md:max-w-[446px]",
+              isSwapping && "animate-assay-recede",
+            )}
+          >
             <h2 className="text-xl font-semibold leading-snug text-white md:text-3xl">
               {collectible.title}
             </h2>

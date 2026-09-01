@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { currency, splitDuration } from "@/lib/format";
 import { useCountdown } from "@/hooks/claw/use-countdown";
 import { Confetti } from "./confetti";
+import { SwapAssay } from "./swap-assay";
 import type { Pull } from "@/lib/claw/types";
 
 type RevealMultiProps = {
@@ -17,6 +18,7 @@ type RevealMultiProps = {
   selectedValue: number;
   expiresAt: number;
   isSwapping: boolean;
+  swappingIds: string[];
   onToggle: (pullId: string) => void;
   onToggleAll: () => void;
   onSwapSelected: () => void;
@@ -31,6 +33,7 @@ export function RevealMulti({
   selectedValue,
   expiresAt,
   isSwapping,
+  swappingIds,
   onToggle,
   onToggleAll,
   onSwapSelected,
@@ -55,6 +58,8 @@ export function RevealMulti({
                 key={pull.id}
                 pull={pull}
                 selected={selectedIds.includes(pull.id)}
+                assaying={swappingIds.includes(pull.id)}
+                receding={isSwapping && !swappingIds.includes(pull.id)}
                 disabled={locked}
                 onToggle={() => onToggle(pull.id)}
                 onSwap={() => onSwapOne(pull)}
@@ -116,12 +121,16 @@ export function RevealMulti({
 function PullCard({
   pull,
   selected,
+  assaying,
+  receding,
   disabled,
   onToggle,
   onSwap,
 }: {
   pull: Pull;
   selected: boolean;
+  assaying: boolean;
+  receding: boolean;
   disabled: boolean;
   onToggle: () => void;
   onSwap: () => void;
@@ -133,16 +142,24 @@ function PullCard({
       className={cn(
         "flex flex-col gap-2 rounded-lg border bg-card p-2 transition-colors duration-200",
         selected ? "border-primary" : "border-border-strong hover:border-primary/40",
+        assaying && "border-primary",
+        receding && "animate-assay-recede",
       )}
     >
-      <div className="relative aspect-square w-full overflow-hidden rounded-md bg-white">
+      <div
+        className={cn(
+          "relative aspect-square w-full overflow-hidden rounded-md transition-colors duration-500",
+          assaying ? "bg-elevated" : "bg-white",
+        )}
+      >
         <Image
           src={collectible.image}
           alt={collectible.title}
           fill
           sizes="(min-width: 768px) 260px, 45vw"
-          className="object-cover"
+          className={cn("object-cover", assaying && "animate-assay-card")}
         />
+        {assaying && <SwapAssay value={collectible.swapValue} compact />}
         <button
           type="button"
           onClick={onToggle}
@@ -150,7 +167,8 @@ function PullCard({
           aria-pressed={selected}
           aria-label={selected ? `Deselect ${collectible.title}` : `Select ${collectible.title}`}
           className={cn(
-            "absolute right-2 top-2 grid size-6 place-items-center rounded-full transition-[background-color,transform] duration-200 active:scale-90",
+            "absolute right-2 top-2 grid size-6 place-items-center rounded-full transition-[background-color,transform,opacity] duration-200 active:scale-90",
+            assaying && "opacity-0",
             selected
               ? "bg-primary text-primary-foreground"
               : "bg-background/85 text-foreground hover:bg-background",

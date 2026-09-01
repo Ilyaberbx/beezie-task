@@ -66,6 +66,15 @@
   --animate-tick-a: tick-a 200ms var(--ease-draw) 160ms both;
   --animate-tick-b: tick-b 300ms var(--ease-draw) 320ms both;
   --animate-tick-settle: tick-settle 420ms var(--ease-out-quint) 580ms both;
+
+  /* The swap signature. All four run the length of SWAP_SETTLEMENT_MS so the
+     assay lands on the same frame the success sheet takes over. */
+  --animate-assay-card: assay-card 1800ms var(--ease-draw) both;
+  --animate-assay-scan: assay-scan 1800ms linear both;
+  --animate-assay-bloom: assay-bloom 1800ms var(--ease-out-quint) both;
+  --animate-assay-credit: assay-credit 1800ms var(--ease-out-quint) both;
+  --animate-assay-recede: assay-recede 420ms var(--ease-out-quint) both;
+  --animate-credit-in: credit-in 620ms var(--ease-out-quint) 260ms both;
 }
 
 @keyframes sheet-in {
@@ -126,6 +135,42 @@
 @keyframes sweep {
   from { transform: translateX(-100%); }
   to { transform: translateX(400%); }
+}
+/* The artwork is appraised, drained of its colour, and folded away. */
+@keyframes assay-card {
+  0% { transform: scale(1); filter: none; }
+  18% { transform: scale(1.015); filter: saturate(1.2) brightness(1.08); }
+  58% { transform: scale(0.99); filter: grayscale(0.8) brightness(0.66); }
+  100% { transform: scale(0.93); filter: grayscale(1) brightness(0.3); opacity: 0.2; }
+}
+/* A single gold pass down the card — the same hairline the gate uses, turned side on.
+   Linear, not eased: an S-curve stalls the pass above the card for half its run. */
+@keyframes assay-scan {
+  0% { transform: translateY(-140%); opacity: 0; }
+  8% { opacity: 1; }
+  42% { opacity: 1; }
+  52%, 100% { transform: translateY(440%); opacity: 0; }
+}
+/* The glow flares first, then the value rises out of it. Overlapping the two
+   peaks just drowns the figure. */
+@keyframes assay-bloom {
+  0%, 44% { opacity: 0; transform: scale(0.55); }
+  62% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.45); }
+}
+@keyframes assay-credit {
+  0%, 52% { opacity: 0; transform: translateY(14px) scale(0.9); }
+  74% { opacity: 1; transform: translateY(-4px) scale(1); }
+  100% { opacity: 0; transform: translateY(-52px) scale(1); }
+}
+/* Everything not being swapped steps back so the assay reads. */
+@keyframes assay-recede {
+  from { opacity: 1; filter: none; }
+  to { opacity: 0.35; filter: saturate(0.4); }
+}
+@keyframes credit-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes stage-in {
   from { opacity: 0; transform: scale(0.985); filter: blur(6px); }
@@ -210,6 +255,20 @@
 }
 @utility bg-gold-gradient-active {
   background-image: linear-gradient(to bottom, #ffca28 0%, #f5b800 46%, #e09a00 100%);
+}
+
+@utility bg-assay-scan {
+  background-image: linear-gradient(
+    to bottom,
+    #ffca2800 0%,
+    #ffca2824 58%,
+    #ffca28d9 88%,
+    #fff6d9f2 96%,
+    #ffca2800 100%
+  );
+}
+@utility bg-assay-bloom {
+  background-image: radial-gradient(circle at center, #ffca2866 0%, #ffca2800 62%);
 }
 
 @utility scroll-fade {

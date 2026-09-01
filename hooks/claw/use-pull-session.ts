@@ -81,6 +81,9 @@ export function usePullSession(slug: string) {
 
   const pulls = useMemo(() => order?.pulls ?? [], [order]);
 
+  /** Which pulls the assay animation should play over right now. */
+  const swappingPulls = stage === "swapping" ? (swap.variables?.pulls ?? []) : [];
+
   const remainingPulls = useMemo(
     () => pulls.filter((pull) => !swappedPullIds.includes(pull.id)),
     [pulls, swappedPullIds],
@@ -174,6 +177,8 @@ export function usePullSession(slug: string) {
     selectedValue,
     swapResult,
     isSwapping: stage === "swapping",
+    swappingPullIds: swappingPulls.map((pull) => pull.id),
+    swappedCount: swap.variables?.pulls.length ?? 0,
     startReview: () => setStage("reviewing"),
     cancelReview: () => setStage("browsing"),
     confirmPurchase: () =>
