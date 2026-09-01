@@ -29,7 +29,11 @@ export function ClawExperience({ slug }: { slug: string }) {
   const revealReady = isBuffered || prefersReducedMotion;
   const isPending =
     session.stage === "pending" || (session.stage === "revealing" && !revealReady);
-  const isResultOpen = session.stage === "revealed" || session.stage === "swapping";
+  // The reveal holds through settling so the assay's last beat plays on the card.
+  const isResultOpen =
+    session.stage === "revealed" ||
+    session.stage === "swapping" ||
+    session.stage === "settling";
   const [firstPull] = session.pulls;
 
   const purchaseControls = (
@@ -83,6 +87,7 @@ export function ClawExperience({ slug }: { slug: string }) {
               open={isResultOpen}
               pull={firstPull}
               isSwapping={session.isSwapping}
+              isSettling={session.isSettling}
               onSwap={() => session.swapPulls([firstPull])}
               onKeep={session.reset}
             />
@@ -97,6 +102,7 @@ export function ClawExperience({ slug }: { slug: string }) {
               expiresAt={session.order.expiresAt}
               isSwapping={session.isSwapping}
               swappingIds={session.swappingPullIds}
+              isSettling={session.isSettling}
               onToggle={session.togglePull}
               onToggleAll={session.toggleAll}
               onSwapSelected={() => session.swapPulls(session.selectedPulls)}

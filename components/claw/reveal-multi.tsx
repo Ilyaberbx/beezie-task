@@ -19,6 +19,7 @@ type RevealMultiProps = {
   expiresAt: number;
   isSwapping: boolean;
   swappingIds: string[];
+  isSettling: boolean;
   onToggle: (pullId: string) => void;
   onToggleAll: () => void;
   onSwapSelected: () => void;
@@ -34,6 +35,7 @@ export function RevealMulti({
   expiresAt,
   isSwapping,
   swappingIds,
+  isSettling,
   onToggle,
   onToggleAll,
   onSwapSelected,
@@ -59,6 +61,7 @@ export function RevealMulti({
                 pull={pull}
                 selected={selectedIds.includes(pull.id)}
                 assaying={swappingIds.includes(pull.id)}
+                settling={isSettling}
                 receding={isSwapping && !swappingIds.includes(pull.id)}
                 disabled={locked}
                 onToggle={() => onToggle(pull.id)}
@@ -122,6 +125,7 @@ function PullCard({
   pull,
   selected,
   assaying,
+  settling,
   receding,
   disabled,
   onToggle,
@@ -130,6 +134,7 @@ function PullCard({
   pull: Pull;
   selected: boolean;
   assaying: boolean;
+  settling: boolean;
   receding: boolean;
   disabled: boolean;
   onToggle: () => void;
@@ -157,9 +162,14 @@ function PullCard({
           alt={collectible.title}
           fill
           sizes="(min-width: 768px) 260px, 45vw"
-          className={cn("object-cover", assaying && "animate-assay-card")}
+          className={cn(
+            "object-cover",
+            assaying && (settling ? "animate-assay-finale" : "animate-assay-drain"),
+          )}
         />
-        {assaying && <SwapAssay value={collectible.swapValue} compact />}
+        {assaying && (
+          <SwapAssay value={collectible.swapValue} settling={settling} compact />
+        )}
         <button
           type="button"
           onClick={onToggle}

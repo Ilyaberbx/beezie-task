@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { clawQueries, purchasePulls, swapPulls } from "@/lib/claw/queries";
 import { InsufficientBalanceError, shortfallFor } from "@/lib/claw/wallet-service";
 import type { PaymentMethodId, Pull, PurchaseResult, SwapResult } from "@/lib/claw/types";
@@ -13,9 +13,14 @@ export type SessionStage =
   | "revealing"
   | "revealed"
   | "swapping"
+  | "settling"
   | "swapped";
 
 export const MAX_QUANTITY = 8;
+
+/** How long the assay's last beat runs once settlement lands. Mirrors the
+    --animate-assay-finale keyframes; the wait before it is unbounded. */
+const ASSAY_FINALE_MS = 900;
 
 export function usePullSession(slug: string) {
   const { data: machine } = useSuspenseQuery(clawQueries.machine(slug));
@@ -68,12 +73,9 @@ export function usePullSession(slug: string) {
   const swap = useMutation({
     mutationFn: swapPulls,
     onMutate: () => setStage("swapping"),
-    onSuccess: (result, request) => {
-      const swapped = request.pulls.map((pull) => pull.id);
-      setSwappedPullIds((current) => [...current, ...swapped]);
-      setSelectedPullIds((current) => current.filter((id) => !swapped.includes(id)));
+    onSuccess: (result) => {
       setSwapResult(result);
-      setStage("swapped");
+      setStage("settling");
       refreshFunds();
     },
     onError: () => setStage("revealed"),
@@ -81,8 +83,23 @@ export function usePullSession(slug: string) {
 
   const pulls = useMemo(() => order?.pulls ?? [], [order]);
 
-  /** Which pulls the assay animation should play over right now. */
-  const swappingPulls = stage === "swapping" ? (swap.variables?.pulls ?? []) : [];
+  // Settlement landing is the cue for the assay's last beat, not for the result
+  // sheet. The pulls leave the grid with that beat rather than under it.
+  const swapVariables = swap.variables;
+  useEffect(() => {
+    if (stage !== "settling") return;
+    const timer = window.setTimeout(() => {
+      const swapped = swapVariables?.pulls.map((pull) => pull.id) ?? [];
+      setSwappedPullIds((current) => [...current, ...swapped]);
+      setSelectedPullIds((current) => current.filter((id) => !swapped.includes(id)));
+      setStage("swapped");
+    }, ASSAY_FINALE_MS);
+    return () => window.clearTimeout(timer);
+  }, [stage, swapVariables]);
+
+  /** Which pulls the assay is playing over — through the finale, not just the wait. */
+  const assaying = stage === "swapping" || stage === "settling";
+  const assayingPulls = assaying ? (swap.variables?.pulls ?? []) : [];
 
   const remainingPulls = useMemo(
     () => pulls.filter((pull) => !swappedPullIds.includes(pull.id)),
@@ -176,8 +193,9 @@ export function usePullSession(slug: string) {
     selectedPulls,
     selectedValue,
     swapResult,
-    isSwapping: stage === "swapping",
-    swappingPullIds: swappingPulls.map((pull) => pull.id),
+    isSwapping: assaying,
+    isSettling: stage === "settling",
+    swappingPullIds: assayingPulls.map((pull) => pull.id),
     startReview: () => setStage("reviewing"),
     cancelReview: () => setStage("browsing"),
     confirmPurchase: () =>

@@ -13,6 +13,7 @@ type RevealSingleProps = {
   open: boolean;
   pull: Pull;
   isSwapping: boolean;
+  isSettling: boolean;
   onSwap: () => void;
   onKeep: () => void;
 };
@@ -21,6 +22,7 @@ export function RevealSingle({
   open,
   pull,
   isSwapping,
+  isSettling,
   onSwap,
   onKeep,
 }: RevealSingleProps) {
@@ -47,10 +49,14 @@ export function RevealSingle({
               sizes="(min-width: 768px) 500px, 90vw"
               className={cn(
                 "object-cover",
-                isSwapping ? "animate-assay-card" : "animate-fade-in",
+                isSettling && "animate-assay-finale",
+                isSwapping && !isSettling && "animate-assay-drain",
+                !isSwapping && "animate-fade-in",
               )}
             />
-            {isSwapping && <SwapAssay value={collectible.swapValue} />}
+            {isSwapping && (
+              <SwapAssay value={collectible.swapValue} settling={isSettling} />
+            )}
           </div>
 
           <div
