@@ -7,8 +7,8 @@ import { cn } from "@/lib/cn";
 import { useSoundPreference } from "@/hooks/claw/use-sound-preference";
 import { useVideoPlayback } from "@/hooks/use-video-playback";
 
-const PANEL_IN_MS = 240;
-const CURTAIN_MS = 420;
+const BLACK_HOLD_MS = 320;
+const CURTAIN_MS = 720;
 
 type RevealOverlayProps = {
   open: boolean;
@@ -50,13 +50,13 @@ export function RevealOverlay({
 
   useEffect(() => {
     if (!rolling || ending) return;
-    const timer = window.setTimeout(() => setLit(true), PANEL_IN_MS);
+    const timer = window.setTimeout(() => setLit(true), BLACK_HOLD_MS);
     return () => window.clearTimeout(timer);
   }, [rolling, ending]);
 
   useEffect(() => {
     if (!ending) return;
-    const timer = window.setTimeout(onFinish, CURTAIN_MS);
+    const timer = window.setTimeout(onFinish, CURTAIN_MS + BLACK_HOLD_MS);
     return () => window.clearTimeout(timer);
   }, [ending, onFinish]);
 
