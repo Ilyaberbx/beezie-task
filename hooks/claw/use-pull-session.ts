@@ -178,7 +178,6 @@ export function usePullSession(slug: string) {
     swapResult,
     isSwapping: stage === "swapping",
     swappingPullIds: swappingPulls.map((pull) => pull.id),
-    swappedCount: swap.variables?.pulls.length ?? 0,
     startReview: () => setStage("reviewing"),
     cancelReview: () => setStage("browsing"),
     confirmPurchase: () =>

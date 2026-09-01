@@ -109,7 +109,6 @@ export function ClawExperience({ slug }: { slug: string }) {
             <SwapSuccessDialog
               open={session.stage === "swapped"}
               result={session.swapResult}
-              count={session.swappedCount}
               onClose={session.dismissSwap}
             />
           )}
