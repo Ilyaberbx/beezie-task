@@ -1,11 +1,5 @@
 import { expect, test } from "@playwright/test";
 
-/**
- * Reads the shipped keyframes back out of the browser. The assay's filter lists
- * have to name the same functions in the same order at every stop: mismatched
- * lists interpolate discretely, so the artwork snaps to grey instead of draining
- * and the animation drops off the compositor.
- */
 async function grayscaleOverDrain(page: import("@playwright/test").Page) {
   return page.evaluate(() => {
     const probe = document.createElement("div");
@@ -15,11 +9,9 @@ async function grayscaleOverDrain(page: import("@playwright/test").Page) {
 
     const samples: number[] = [];
     for (let percent = 0; percent <= 100; percent += 5) {
-      // A negative delay of the full duration reads as not-yet-started, so stop just short.
       probe.style.animationDelay = `-${Math.min((620 * percent) / 100, 619.9)}ms`;
       const filter = getComputedStyle(probe).filter;
       const match = /grayscale\(([\d.]+)\)/.exec(filter);
-      // No grayscale() at all means the list changed shape mid-animation.
       samples.push(match ? Number(match[1]) : NaN);
     }
     probe.remove();
@@ -27,8 +19,6 @@ async function grayscaleOverDrain(page: import("@playwright/test").Page) {
   });
 }
 
-// The default lane pins every animation with `animation-delay: 0.01ms !important`,
-// which would hold the probe at its first frame.
 test.describe("with motion allowed", () => {
   test.use({ contextOptions: { reducedMotion: "no-preference" } });
 
@@ -44,7 +34,6 @@ test.describe("with motion allowed", () => {
 
     const steps = samples.slice(1).map((value, index) => value - samples[index]);
     expect(Math.min(...steps)).toBeGreaterThanOrEqual(-0.001);
-    // A discrete swap moves the whole 0.85 in one 5% step.
     expect(Math.max(...steps)).toBeLessThan(0.2);
   });
 
@@ -64,7 +53,6 @@ test.describe("with motion allowed", () => {
     await result.getByRole("button", { name: /^Swap 2 items for \$/ }).click();
     await page.locator("[data-assay-scan]").first().waitFor();
 
-    // Read the first frame off the animation itself rather than racing the stagger.
     const bars = await page.evaluate(() =>
       [...document.querySelectorAll("[data-assay-scan]")].map((el) => {
         const animation = el.getAnimations()[0];
@@ -74,7 +62,6 @@ test.describe("with motion allowed", () => {
         const bar = el.getBoundingClientRect();
         return {
           fill: getComputedStyle(el).animationFillMode,
-          // Where the bar's leading edge sits in the card, 0 = flush with the top.
           leadingEdgePct: ((bar.bottom - card.top) / card.height) * 100,
         };
       }),
@@ -82,7 +69,6 @@ test.describe("with motion allowed", () => {
 
     expect(bars.length).toBeGreaterThan(0);
     for (const bar of bars) {
-      // Without a backwards fill the staggered cards show an un-animated bar.
       expect(bar.fill).toBe("backwards");
       expect(bar.leadingEdgePct).toBeGreaterThan(-1);
       expect(bar.leadingEdgePct).toBeLessThan(4);

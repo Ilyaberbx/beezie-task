@@ -25,8 +25,6 @@ export function useCountdown(expiresAt: number | null): number | null {
   return Math.max(0, expiresAt - now);
 }
 
-/** Ticks once, at the deadline. A boolean snapshot lets useSyncExternalStore bail
- *  out of the other 1/s renders, so the countdown never reconciles the card grid. */
 export function useDeadlinePassed(expiresAt: number | null): boolean {
   const getSnapshot = useCallback(
     () => expiresAt !== null && sharedNow !== 0 && sharedNow >= expiresAt,

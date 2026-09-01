@@ -108,7 +108,6 @@ export function RevealMulti({
   );
 }
 
-/** Owns the once-a-second tick so it stays off the card grid, which is mid-assay. */
 function SwapWindow({ expiresAt }: { expiresAt: number | null }) {
   const remainingMs = useCountdown(expiresAt);
   const { minutes, seconds } = splitDuration(remainingMs ?? 0);

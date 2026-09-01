@@ -2,11 +2,6 @@
 
 import { useEffect } from "react";
 
-/**
- * Dialogs hand off to each other, so two locks overlap by design. Counting them
- * keeps the restore honest: without it the outgoing dialog writes the incoming
- * dialog's "hidden" back onto <html> and the page never scrolls again.
- */
 let locks = 0;
 let restore = "";
 

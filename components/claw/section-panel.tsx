@@ -20,9 +20,6 @@ export function SectionPanel({
         role="group"
         aria-label={title}
         className={cn(
-          // Below md the panel is not a scroller at all: nothing carries a list
-          // under it, so it grows and the page does the scrolling. One surface
-          // under the thumb beats two nested ones fighting over the same swipe.
           "@container mt-4 min-h-0 flex-1 px-4 focus-visible:outline-offset-[-2px]",
           "md:scroll-y md:mt-6 md:px-5",
           className,

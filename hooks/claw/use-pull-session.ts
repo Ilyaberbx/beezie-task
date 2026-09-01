@@ -120,8 +120,6 @@ export function usePullSession(slug: string) {
     purchase.reset();
   }, [purchase, swap]);
 
-  // The grid only loses the swapped cards on the way back in. Retiring them at the
-  // finale reflows the list under a dialog that is still fading out.
   const dismissSwap = useCallback(() => {
     const swapped = swapVariables?.pulls.map((pull) => pull.id) ?? [];
     const survivors = remainingPulls.filter((pull) => !swapped.includes(pull.id));

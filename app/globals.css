@@ -129,9 +129,6 @@
   to { transform: translateX(400%); }
 }
 
-/* Every keyframe carries the same filter functions in the same order, so the
-   list interpolates componentwise on the compositor. Mismatched lists fall back
-   to a discrete swap: the artwork used to snap to grey two-thirds of the way in. */
 @keyframes assay-drain {
   0% { transform: scale(1); filter: grayscale(0) saturate(1) brightness(1); }
   35% { transform: scale(1.015); filter: grayscale(0) saturate(1.2) brightness(1.08); }
@@ -142,11 +139,6 @@
   to { transform: scale(0.93); filter: grayscale(1) saturate(1) brightness(0.3); opacity: 0.2; }
 }
 
-/* Transform only, and `backwards` on the token: without a fill the staggered
-   cards render the bar parked at full opacity through their delay, then blank it
-   to re-enter. The bar's bright line sits at 96% of its height, so -96% puts that
-   line exactly on the card's top edge; overflow-hidden covers both ends, which is
-   what the old opacity fades were for. */
 @keyframes assay-scan {
   0% { transform: translateY(-96%); }
   80%, 100% { transform: translateY(400%); }
@@ -178,8 +170,6 @@
   from { opacity: 1; }
   to { opacity: 0.35; }
 }
-/* Reduced-motion stand-ins: the assay still reads as working, and still credits,
-   without the sweep or the travel. */
 @keyframes assay-hold {
   0%, 100% { opacity: 0.28; }
   50% { opacity: 0.62; }
@@ -266,8 +256,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Ellipse centred above the top edge: the light bows across the face instead of
-   banding flat. Percentages keep the same arc on a 200px and a 900px button. */
 :root {
   --gold-arc: 100% 230% at 50% -34%;
 }
@@ -320,30 +308,8 @@
   background-image: radial-gradient(circle at center, #ffca2866 0%, #ffca2800 62%);
 }
 
-/* Scrollbars are hidden document-wide, which leaves an inner scroller with no
-   handle and no hint that it moves. Give the ones carrying real content a thin
-   rail back — but only where there is a pointer to grab it with, since touch
-   already draws its own overlay bar. */
 @utility scroll-y {
   overflow-y: auto;
-
-  @media (any-pointer: fine) {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border-strong) transparent;
-
-    &::-webkit-scrollbar {
-      display: block;
-      width: 10px;
-    }
-    &::-webkit-scrollbar-thumb {
-      border: 3px solid transparent;
-      border-radius: 5px;
-      background: var(--color-border-strong) content-box;
-    }
-    &::-webkit-scrollbar-thumb:hover {
-      background-color: var(--color-muted-foreground);
-    }
-  }
 }
 
 @utility pb-safe-* {
@@ -419,13 +385,9 @@
     translate: none !important;
   }
 
-  /* The blanket kill above leaves the assay with nothing to show across its 1.8s.
-     Swap the sweep for a breathing wash and the rising credit for a plain fade. */
   [data-assay-scan] {
     bottom: 0;
     height: auto;
-    /* The sweep gradient is directional; stretched full-height it pins a bright
-       band to the bottom edge. A centred glow reads as working from any angle. */
     background-image: radial-gradient(circle at center, #ffca2840 0%, #ffca2800 68%);
     animation: assay-hold 1400ms ease-in-out infinite backwards !important;
   }

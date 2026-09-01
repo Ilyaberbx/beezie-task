@@ -52,8 +52,6 @@ export function useLiveRecentPulls(
       timers.add(settle);
     };
 
-    // Rows animate grid-template-rows, which lays out every frame. Nobody can see
-    // them under a dialog, so don't spend the main thread the assay is animating on.
     const sync = () => {
       if (document.visibilityState === "visible" && !dialogCoversTheFeed) {
         unsubscribe ??= feed.subscribe(receive);

@@ -71,10 +71,6 @@ export function isResultStage(stage: SessionStage) {
   return stage === "revealed" || stage === "swapping" || stage === "settling";
 }
 
-// "swapped" is past the result stage, so the reveal dialog is already fading out —
-// but it is still on screen for the length of that fade. Keep it wearing its
-// finished-assay face until it is gone, or every card snaps back to full colour
-// for the exit.
 export function isAssayingStage(stage: SessionStage) {
   return stage === "swapping" || stage === "settling" || stage === "swapped";
 }
