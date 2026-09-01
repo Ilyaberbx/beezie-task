@@ -23,12 +23,11 @@ import {
 } from "@/lib/ui/dialog-morph";
 import {
   dialogVersion,
-  hasOtherDialog,
+  hasLiveDialog,
   leaveHandoffBox,
   publish,
-  setWaiting,
   takeFreshHandoffBox,
-  waitingDialogs,
+  type Handoff,
 } from "@/lib/ui/dialog-registry";
 
 const EXIT_MS = 180;
@@ -70,14 +69,10 @@ export function useDialogChoreography({
   const onOpenedRef = useRef(onOpened);
   const box = useRef<Box | null>(null);
   const morph = useRef<Morph | null>(null);
+  const handedOver = useRef<Handoff | null>(null);
 
   useSyncExternalStore(dialogVersion.subscribe, dialogVersion.get, dialogVersion.getServer);
-  const queued = useSyncExternalStore(
-    waitingDialogs.subscribe,
-    waitingDialogs.get,
-    waitingDialogs.getServer,
-  );
-  const hasOther = hasOtherDialog(id);
+  const blocked = hasLiveDialog(id);
 
   useEffect(() => {
     onOpenedRef.current = onOpened;
@@ -86,7 +81,8 @@ export function useDialogChoreography({
   useBeforePaint(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open && !hasOther) {
+    if (open && !dialog.open && !blocked) {
+      handedOver.current = null;
       dialog.showModal();
       dialog.focus();
       onOpenedRef.current?.();
@@ -96,6 +92,7 @@ export function useDialogChoreography({
       box.current = to;
 
       if (morphable && from && boxesDiffer(to, from, MORPH_EPSILON_PX)) {
+        from.taken = true;
         cancelEntranceKeyframes(dialog);
         const settle = () => {
           box.current = measureBox(dialog);
@@ -105,34 +102,29 @@ export function useDialogChoreography({
       }
     }
     if (open && dialog.open && !closing) publish(id, "open");
-    if (!open && dialog.open && !closing) setClosing(true);
-  }, [ref, open, hasOther, closing, id, morphable]);
-
-  useEffect(() => {
-    if (!open || !hasOther) return;
-    setWaiting(1);
-    return () => setWaiting(-1);
-  }, [open, hasOther]);
+    if (!open && dialog.open && !closing) {
+      if (morphable) {
+        stopMorph(dialog, morph);
+        handedOver.current = leaveHandoffBox(measureBox(dialog));
+      }
+      publish(id, "closing");
+      setClosing(true);
+    }
+  }, [ref, open, blocked, closing, id, morphable]);
 
   useEffect(() => {
     if (!closing) return;
-    publish(id, "closing");
-    const handsOverToAWaitingDialog = queued > 0 && morphable;
+    const succeeded = handedOver.current?.taken ?? false;
     const timer = window.setTimeout(
       () => {
-        const dialog = ref.current;
-        if (dialog && morphable) {
-          stopMorph(dialog, morph);
-          leaveHandoffBox(measureBox(dialog));
-        }
-        dialog?.close();
+        ref.current?.close();
         publish(id, null);
         setClosing(false);
       },
-      reduceMotion || handsOverToAWaitingDialog ? 0 : EXIT_MS,
+      reduceMotion || succeeded ? 0 : EXIT_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [ref, closing, reduceMotion, id, queued, morphable]);
+  }, [ref, closing, reduceMotion, id]);
 
   useEffect(() => {
     const dialog = ref.current;

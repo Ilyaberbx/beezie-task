@@ -2,23 +2,17 @@ import { createBooleanStore, createCounterStore, type ExternalStore } from "./st
 import type { Box } from "./box.ts";
 
 export type DialogPhase = "open" | "closing";
+export type Handoff = Box & { at: number; taken: boolean };
 
 const HANDOFF_MS = 500;
 
 const openDialogs = new Map<symbol, DialogPhase>();
 const version = createCounterStore();
 
-let waiting = 0;
-let handoff: (Box & { at: number }) | null = null;
+let handoff: Handoff | null = null;
 
 export const dialogVersion: ExternalStore<number> = version;
 export const anyDialogOpen = createBooleanStore();
-
-export const waitingDialogs: ExternalStore<number> = {
-  subscribe: version.subscribe,
-  get: () => waiting,
-  getServer: () => 0,
-};
 
 export function publish(id: symbol, phase: DialogPhase | null) {
   if (phase === null) {
@@ -28,26 +22,22 @@ export function publish(id: symbol, phase: DialogPhase | null) {
     openDialogs.set(id, phase);
   }
   version.increment();
-  anyDialogOpen.set(openDialogs.size > 0);
+  anyDialogOpen.set(hasLiveDialog(null));
 }
 
-export function setWaiting(delta: number) {
-  waiting += delta;
-  version.increment();
-}
-
-export function hasOtherDialog(id: symbol) {
-  for (const key of openDialogs.keys()) if (key !== id) return true;
+export function hasLiveDialog(id: symbol | null) {
+  for (const [key, phase] of openDialogs) if (key !== id && phase === "open") return true;
   return false;
 }
 
-export function leaveHandoffBox(box: Box) {
-  handoff = { ...box, at: performance.now() };
+export function leaveHandoffBox(box: Box): Handoff {
+  handoff = { ...box, at: performance.now(), taken: false };
+  return handoff;
 }
 
-export function takeFreshHandoffBox(): Box | null {
+export function takeFreshHandoffBox(): Handoff | null {
   const left = handoff;
   handoff = null;
   if (!left || performance.now() - left.at >= HANDOFF_MS) return null;
-  return { w: left.w, h: left.h };
+  return left;
 }
