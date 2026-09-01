@@ -4,9 +4,7 @@ import { Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Dialog } from "@/components/ui/dialog";
 import { useSoundPreference } from "@/hooks/claw/use-sound-preference";
-
-/** How long the picture may sit on one frame before we hand over the result. */
-const STALL_MS = 1500;
+import { useVideoPlayback } from "@/hooks/use-video-playback";
 
 type RevealOverlayProps = {
   open: boolean;
@@ -25,48 +23,18 @@ export function RevealOverlay({
   const [soundOn, setSoundOn] = useSoundPreference();
   const [openings, setOpenings] = useState(0);
 
-  useEffect(() => {
-    const element = videoRef.current;
-    if (!element) return;
-    element.muted = !soundOn;
-  }, [soundOn, openings]);
+  useVideoPlayback(videoRef, {
+    playing: open && openings > 0,
+    muted: !soundOn,
+    restartKey: openings,
+    rewindWhenStopped: true,
+    onStall: onFinish,
+    onGiveUp: onFinish,
+  });
 
   useEffect(() => {
     if (open && skipAnimation) onFinish();
   }, [open, skipAnimation, onFinish]);
-
-  useEffect(() => {
-    if (open) return;
-    const element = videoRef.current;
-    if (!element) return;
-    element.pause();
-    element.currentTime = 0;
-  }, [open]);
-
-  useEffect(() => {
-    if (!open || openings === 0) return;
-
-    const element = videoRef.current;
-    if (!element) return;
-
-    const play = () => element.play();
-    void play().catch(() => {
-      element.muted = true;
-      return play().catch(onFinish);
-    });
-
-    // One watchdog for the whole playback, not just its start. A reveal that
-    // never gets a decoder and one that stalls mid-frame look identical from
-    // here, and this overlay has no way out — if the picture stops moving,
-    // give the user their result rather than a still they cannot dismiss.
-    let last = -1;
-    const watchdog = window.setInterval(() => {
-      if (element.currentTime === last) return onFinish();
-      last = element.currentTime;
-    }, STALL_MS);
-
-    return () => window.clearInterval(watchdog);
-  }, [open, openings, onFinish]);
 
   if (skipAnimation) return null;
 

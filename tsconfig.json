@@ -6,7 +6,6 @@
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    // lib/*.test.mjs runs under node, which needs explicit .ts specifiers.
     "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "module": "esnext",

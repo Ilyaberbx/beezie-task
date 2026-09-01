@@ -27,6 +27,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm test
+      - run: pnpm exec playwright install --with-deps chromium
+        # No NEXT_PUBLIC_BASE_PATH here: the e2e build is served at the root.
+      - run: pnpm test:e2e
       - run: pnpm build
         env:
           NEXT_PUBLIC_BASE_PATH: /beezie-task

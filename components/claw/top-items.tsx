@@ -2,15 +2,8 @@ import { FadeImage } from "@/components/ui/fade-image";
 import { currency } from "@/lib/format";
 import { SectionPanel } from "./section-panel";
 import { Separator } from "@/components/ui/separator";
-import type { RarityKey, TopItem } from "@/lib/claw/types";
-
-const FMV_COLOR: Record<RarityKey, string> = {
-  ultra: "text-rarity-ultra",
-  rare: "text-rarity-rare",
-  uncommon: "text-rarity-uncommon",
-  common: "text-rarity-common",
-  base: "text-rarity-base",
-};
+import { FMV_COLOR } from "@/lib/claw/rarity";
+import type { TopItem } from "@/lib/claw/types";
 
 export function TopItems({ items }: { items: TopItem[] }) {
   return (

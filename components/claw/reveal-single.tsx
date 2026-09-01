@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -7,6 +5,9 @@ import { cn } from "@/lib/cn";
 import { currency } from "@/lib/format";
 import { SwapAssay } from "./swap-assay";
 import type { Pull } from "@/lib/claw/types";
+
+const artworkCappedByHeightSoTheSwapButtonsStayOnScreen =
+  "relative aspect-square w-full max-w-[min(80%,34svh)] justify-self-center overflow-hidden rounded-xl shadow-card transition-colors duration-500 md:max-w-[min(440px,60svh)] md:justify-self-end";
 
 type RevealSingleProps = {
   open: boolean;
@@ -26,6 +27,7 @@ export function RevealSingle({
   onKeep,
 }: RevealSingleProps) {
   const { collectible } = pull;
+  const artworkDissolvesIntoDark = isSwapping;
 
   return (
     <Dialog open={open} onClose={onKeep} label="Your pull" variant="fullscreen">
@@ -33,12 +35,8 @@ export function RevealSingle({
         <div className="relative grid flex-1 content-center-safe gap-6 p-4 pt-12 md:grid-cols-2 md:content-center md:items-center md:gap-12 md:p-12">
           <div
             className={cn(
-              // Sized off width alone, the square eats the whole panel on any
-              // window that is wide but not wide enough for two columns, and
-              // the swap buttons fall off the bottom. Cap it by height too.
-              "relative aspect-square w-full max-w-[min(80%,34svh)] justify-self-center overflow-hidden rounded-xl shadow-card transition-colors duration-500 md:max-w-[min(440px,60svh)] md:justify-self-end",
-              // The artwork drains away; it has to dissolve into the dark, not into the frame's white.
-              isSwapping ? "bg-elevated" : "bg-white",
+              artworkCappedByHeightSoTheSwapButtonsStayOnScreen,
+              artworkDissolvesIntoDark ? "bg-elevated" : "bg-white",
             )}
           >
             <Image

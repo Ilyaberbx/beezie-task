@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { cn } from "@/lib/cn";
 import { currency, splitDuration } from "@/lib/format";
+import { isSwapWindowExpired, swapButtonLabel } from "@/lib/claw/session";
 import { useCountdown } from "@/hooks/claw/use-countdown";
+import { assaySweepDelayMs } from "@/lib/ui/stagger";
 import { SwapAssay } from "./swap-assay";
 import type { Pull } from "@/lib/claw/types";
 
@@ -44,7 +46,7 @@ export function RevealMulti({
   const remainingMs = useCountdown(open ? expiresAt : null);
   const { minutes, seconds } = splitDuration(remainingMs ?? 0);
   const allSelected = selectedIds.length === pulls.length && pulls.length > 0;
-  const expired = remainingMs !== null && remainingMs <= 0;
+  const expired = isSwapWindowExpired(remainingMs);
   const locked = isSwapping || expired;
 
   return (
@@ -99,13 +101,12 @@ export function RevealMulti({
               onClick={onSwapSelected}
               disabled={selectedIds.length === 0 || locked}
             >
-              {expired
-                ? "Swap window closed"
-                : isSwapping
-                  ? "Swap in progress"
-                  : selectedIds.length === 0
-                    ? "Swap"
-                    : `Swap ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""} for ${currency(selectedValue)}`}
+              {swapButtonLabel({
+                expired,
+                isSwapping,
+                selectedCount: selectedIds.length,
+                selectedValue,
+              })}
             </Button>
             <Info
               className="hidden size-4 shrink-0 text-secondary-foreground md:block"
@@ -171,7 +172,7 @@ function PullCard({
           <SwapAssay
             value={collectible.swapValue}
             settling={settling}
-            delayMs={index * 130}
+            delayMs={assaySweepDelayMs(index)}
             compact
           />
         )}

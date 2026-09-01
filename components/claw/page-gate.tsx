@@ -1,36 +1,29 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { asset } from "@/lib/asset";
 import { cn } from "@/lib/cn";
 import { useStageReady } from "@/hooks/claw/use-stage-ready";
 import { usePrefersReducedMotion } from "@/hooks/use-media-query";
+import { useMinimumHold } from "@/hooks/use-minimum-hold";
 
-/** Hold the gate this long even on a warm cache, so it reads as a curtain, not a flicker. */
-const FLOOR_MS = 640;
+const GATE_FLOOR_MS = 640;
+const gateLiftsOnACssCeilingWithoutJs = "animate-gate-out";
+const gateLiftsNow = "animate-gate-out-now";
 
 export function PageGate() {
   const stageReady = useStageReady();
   const prefersReducedMotion = usePrefersReducedMotion();
-  const [floorPassed, setFloorPassed] = useState(false);
-  const done = prefersReducedMotion || (stageReady && floorPassed);
-
-  useEffect(() => {
-    if (!stageReady) return;
-    const remaining = Math.max(0, FLOOR_MS - performance.now());
-    const timer = window.setTimeout(() => setFloorPassed(true), remaining);
-    return () => window.clearTimeout(timer);
-  }, [stageReady]);
+  const heldAsACurtain = useMinimumHold(stageReady, GATE_FLOOR_MS);
+  const done = prefersReducedMotion || heldAsACurtain;
 
   return (
     <div
       aria-hidden
       data-done={done || undefined}
-      // No animate-* on the wrapper: the CSS ceiling must lift it even if JS never runs.
       className={cn(
         "fixed inset-0 z-50 grid place-items-center bg-background",
-        done ? "animate-gate-out-now" : "animate-gate-out",
+        done ? gateLiftsNow : gateLiftsOnACssCeilingWithoutJs,
       )}
     >
       <div className="flex flex-col items-center gap-7">

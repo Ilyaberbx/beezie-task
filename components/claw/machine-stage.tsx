@@ -1,11 +1,18 @@
 "use client";
 
 import { Sparkles, Volume2, VolumeX } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useAnyDialogOpen } from "@/components/ui/dialog";
 import { markStageReady } from "@/hooks/claw/use-stage-ready";
 import { useSoundPreference } from "@/hooks/claw/use-sound-preference";
+import { useVideoPlayback } from "@/hooks/use-video-playback";
 import { cn } from "@/lib/cn";
+
+const stageFillsTheRowItSharesWithTheCard =
+  "relative mx-auto aspect-square w-full max-h-[72svh] max-w-[72svh] overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-panel md:aspect-auto md:h-full md:max-h-none md:max-w-none md:rounded-panel";
+
+const videoOutOfFlowSoTheRowSetsTheHeight =
+  "absolute inset-0 size-full object-cover transition-opacity duration-700 ease-out";
 
 type MachineStageProps = {
   name: string;
@@ -18,51 +25,29 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
   const [soundOn, setSoundOn] = useSoundPreference();
   const [animationOn, setAnimationOn] = useState(true);
   const [ready, setReady] = useState(false);
-  // Nothing behind a modal is visible, and a phone has very few video decoders
-  // to go around — a loop still running under the reveal is what starves it.
-  const dialogOpen = useAnyDialogOpen();
-  const playing = animationOn && !dialogOpen;
+  const dialogCoversStageAndNeedsItsDecoder = useAnyDialogOpen();
+  const playing = animationOn && !dialogCoversStageAndNeedsItsDecoder;
 
-  useEffect(() => {
-    const element = videoRef.current;
-    if (!element) return;
-    element.muted = !soundOn;
-    if (soundOn && element.paused && playing) void element.play().catch(() => undefined);
-  }, [soundOn, playing]);
-
-  useEffect(() => {
-    const element = videoRef.current;
-    if (!element) return;
-    if (playing) {
-      void element.play().catch(() => undefined);
-    } else {
-      element.pause();
-    }
-  }, [playing]);
-
-  // A cached video can already be playable before this component mounts.
-  useEffect(() => {
-    if (videoRef.current && videoRef.current.readyState >= 3) handleReady();
-  }, []);
-
-  function handleReady() {
+  const handleReady = useCallback(() => {
     setReady(true);
     markStageReady();
-  }
+  }, []);
 
-  // Stacked, the stage is a square. Beside the card it is the card's twin: the
-  // grid row is sized by the card, so the stage just fills the row it shares.
+  useVideoPlayback(videoRef, {
+    playing,
+    muted: !soundOn,
+    onCachedAndPlayable: handleReady,
+  });
+
   return (
     <div
-      className="relative mx-auto aspect-square w-full max-h-[72svh] max-w-[72svh] overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-panel md:aspect-auto md:h-full md:max-h-none md:max-w-none md:rounded-panel"
+      className={stageFillsTheRowItSharesWithTheCard}
       style={{ backgroundImage: `url(${poster})` }}
     >
       <video
         ref={videoRef}
         className={cn(
-          // Out of flow, so the stage takes its height from the row rather than
-          // from the video's own 1080 lines.
-          "absolute inset-0 size-full object-cover transition-opacity duration-700 ease-out",
+          videoOutOfFlowSoTheRowSetsTheHeight,
           ready ? "opacity-100" : "opacity-0",
         )}
         poster={poster}

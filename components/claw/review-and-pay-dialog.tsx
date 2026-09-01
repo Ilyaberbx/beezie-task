@@ -8,6 +8,7 @@ import { useId } from "react";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
+import { orderTotals, type Affordability } from "@/lib/claw/session";
 import { shortfallFor } from "@/lib/claw/wallet-service";
 import type { ClawMachine, PaymentMethod, PaymentMethodId } from "@/lib/claw/types";
 
@@ -15,14 +16,6 @@ const TABS = [
   { id: "beezie-wallet", label: "Wallet" },
   { id: "card", label: "Credit/ Debit" },
 ] as const satisfies readonly { id: PaymentMethodId; label: string }[];
-
-type Affordability = {
-  total: number;
-  shortfall: number;
-  canAfford: boolean;
-  affordableQuantity: number;
-  methodLabel: string;
-};
 
 type ReviewAndPayDialogProps = {
   open: boolean;
@@ -49,8 +42,7 @@ export function ReviewAndPayDialog({
   onConfirm,
   onClose,
 }: ReviewAndPayDialogProps) {
-  const total = machine.price * quantity;
-  const points = machine.points * quantity;
+  const { total, points } = orderTotals(machine, quantity);
   const alertId = useId();
   const payingByCard = selectedMethodId === "card";
   const wallets = methods.filter((method) => method.id !== "card");
@@ -88,14 +80,7 @@ export function ReviewAndPayDialog({
             </div>
 
             <div className="relative grid grid-cols-2 rounded-md border border-border sm:hidden">
-              {/* One pill that slides, rather than two that blink on and off. */}
-              <span
-                aria-hidden
-                className={cn(
-                  "absolute inset-y-0 left-0 w-1/2 rounded-[5px] bg-primary transition-transform duration-300 ease-out-quint",
-                  payingByCard && "translate-x-full",
-                )}
-              />
+              <SlidingTabPill shifted={payingByCard} />
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -239,6 +224,18 @@ export function ReviewAndPayDialog({
         </Button>
       </div>
     </Dialog>
+  );
+}
+
+function SlidingTabPill({ shifted }: { shifted: boolean }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "absolute inset-y-0 left-0 w-1/2 rounded-[5px] bg-primary transition-transform duration-300 ease-out-quint",
+        shifted && "translate-x-full",
+      )}
+    />
   );
 }
 

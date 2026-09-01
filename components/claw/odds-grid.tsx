@@ -1,17 +1,7 @@
 import { CircleHelp } from "lucide-react";
 import { currency, percent } from "@/lib/format";
-import type { RarityKey, RarityTier } from "@/lib/claw/types";
-
-const RARITY_STYLE: Record<
-  RarityKey,
-  { tint: string; border: string; label: string; chance: string }
-> = {
-  ultra: { tint: "255 202 40", border: "#ffca28", label: "text-rarity-ultra", chance: "text-primary" },
-  rare: { tint: "192 132 252", border: "#c084fc", label: "text-rarity-rare", chance: "text-rarity-rare" },
-  uncommon: { tint: "110 231 183", border: "#6ee7b7", label: "text-rarity-uncommon", chance: "text-rarity-uncommon" },
-  common: { tint: "96 165 250", border: "#60a5fa", label: "text-rarity-common", chance: "text-rarity-common" },
-  base: { tint: "170 170 170", border: "#aaaaaa", label: "text-foreground", chance: "text-foreground" },
-};
+import { RARITY_STYLE, rarityTintGradient } from "@/lib/claw/rarity";
+import type { RarityTier } from "@/lib/claw/types";
 
 export function OddsGrid({
   odds,
@@ -55,7 +45,7 @@ export function OddsGrid({
               className="flex flex-col gap-1.5 rounded-sm border-l bg-elevated px-1.5 py-2 md:px-2 md:py-3"
               style={{
                 borderLeftColor: style.border,
-                backgroundImage: `linear-gradient(90deg, rgb(${style.tint} / 0.07) 0%, rgb(${style.tint} / 0) 100%)`,
+                backgroundImage: rarityTintGradient(style.tint),
               }}
             >
               <span className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1 text-[10px] font-medium leading-none md:font-semibold">

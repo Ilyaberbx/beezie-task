@@ -3,23 +3,19 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { clawQueries, purchasePulls, swapPulls } from "@/lib/claw/queries";
-import { InsufficientBalanceError, shortfallFor } from "@/lib/claw/wallet-service";
+import {
+  MAX_QUANTITY,
+  clampQuantity,
+  computeAffordability,
+  isAssayingStage,
+  type SessionStage,
+} from "@/lib/claw/session";
+import { InsufficientBalanceError } from "@/lib/claw/wallet-service";
 import type { PaymentMethodId, Pull, PurchaseResult, SwapResult } from "@/lib/claw/types";
 
-export type SessionStage =
-  | "browsing"
-  | "reviewing"
-  | "pending"
-  | "revealing"
-  | "revealed"
-  | "swapping"
-  | "settling"
-  | "swapped";
+export { MAX_QUANTITY };
+export type { SessionStage };
 
-export const MAX_QUANTITY = 8;
-
-/** How long the assay's last beat runs once settlement lands. Mirrors the
-    --animate-assay-finale keyframes; the wait before it is unbounded. */
 const ASSAY_FINALE_MS = 900;
 
 export function usePullSession(slug: string) {
@@ -80,28 +76,30 @@ export function usePullSession(slug: string) {
     onError: () => setStage("revealed"),
   });
 
+  const { mutate: runPurchase } = purchase;
+  const { mutate: runSwap } = swap;
+
   const pulls = useMemo(() => order?.pulls ?? [], [order]);
 
-  // Settlement landing is the cue for the assay's last beat, not for the result
-  // sheet. The pulls leave the grid with that beat rather than under it.
   const swapVariables = swap.variables;
   useEffect(() => {
     if (stage !== "settling") return;
-    const timer = window.setTimeout(() => {
+    const assayFinale = window.setTimeout(() => {
       const swapped = swapVariables?.pulls.map((pull) => pull.id) ?? [];
       setSwappedPullIds((current) => [...current, ...swapped]);
       setSelectedPullIds((current) => current.filter((id) => !swapped.includes(id)));
       setStage("swapped");
-      // The wallet ticks over when the value has finished leaving the card, not
-      // while it is still on screen.
       refreshFunds();
     }, ASSAY_FINALE_MS);
-    return () => window.clearTimeout(timer);
+    return () => window.clearTimeout(assayFinale);
   }, [stage, swapVariables, refreshFunds]);
 
-  /** Which pulls the assay is playing over — through the finale, not just the wait. */
-  const assaying = stage === "swapping" || stage === "settling";
-  const assayingPulls = assaying ? (swap.variables?.pulls ?? []) : [];
+  const assaying = isAssayingStage(stage);
+
+  const swappingPullIds = useMemo(
+    () => (assaying ? (swapVariables?.pulls ?? []) : []).map((pull) => pull.id),
+    [assaying, swapVariables],
+  );
 
   const remainingPulls = useMemo(
     () => pulls.filter((pull) => !swappedPullIds.includes(pull.id)),
@@ -133,26 +131,50 @@ export function usePullSession(slug: string) {
     setStage("revealed");
   }, [remainingPulls.length, reset]);
 
-  const total = machine.price * quantity;
-  const selectedMethod = paymentMethods.find(
-    (method) => method.id === paymentMethodId,
+  const affordability = useMemo(
+    () =>
+      computeAffordability({
+        price: machine.price,
+        quantity,
+        method: paymentMethods.find((method) => method.id === paymentMethodId),
+        balanceError,
+        maxQuantity: MAX_QUANTITY,
+      }),
+    [machine.price, quantity, paymentMethods, paymentMethodId, balanceError],
   );
-  const methodBalance = selectedMethod?.balance;
-  const shortfall = shortfallFor(methodBalance, total);
-  const affordableQuantity =
-    methodBalance === undefined
-      ? MAX_QUANTITY
-      : Math.floor(methodBalance / machine.price);
-
-  const affordability = {
-    total,
-    shortfall: balanceError?.shortfall ?? shortfall,
-    canAfford: shortfall === 0 && balanceError === null,
-    affordableQuantity: Math.min(MAX_QUANTITY, affordableQuantity),
-    methodLabel: selectedMethod?.label ?? "this method",
-  };
 
   const finishReveal = useCallback(() => setStage("revealed"), []);
+
+  const adjustQuantity = useCallback((delta: number) => {
+    setBalanceError(null);
+    setQuantity((current) => clampQuantity(current + delta, MAX_QUANTITY));
+  }, []);
+
+  const setQuantityTo = useCallback((next: number) => {
+    setBalanceError(null);
+    setQuantity(clampQuantity(next, MAX_QUANTITY));
+  }, []);
+
+  const selectPaymentMethod = useCallback((id: PaymentMethodId) => {
+    setBalanceError(null);
+    setPaymentMethodId(id);
+  }, []);
+
+  const startReview = useCallback(() => setStage("reviewing"), []);
+  const cancelReview = useCallback(() => setStage("browsing"), []);
+
+  const confirmPurchase = useCallback(
+    () => runPurchase({ slug, quantity, paymentMethodId }),
+    [runPurchase, slug, quantity, paymentMethodId],
+  );
+
+  const swapChosenPulls = useCallback(
+    (chosen: Pull[]) => {
+      if (!order) return;
+      runSwap({ pulls: chosen, expiresAt: order.expiresAt });
+    },
+    [order, runSwap],
+  );
 
   const togglePull = useCallback((pullId: string) => {
     setSelectedPullIds((current) =>
@@ -172,21 +194,12 @@ export function usePullSession(slug: string) {
     machine,
     paymentMethods,
     quantity,
-    adjustQuantity: (delta: number) => {
-      setBalanceError(null);
-      setQuantity((current) => Math.min(MAX_QUANTITY, Math.max(1, current + delta)));
-    },
-    setQuantityTo: (next: number) => {
-      setBalanceError(null);
-      setQuantity(Math.min(MAX_QUANTITY, Math.max(1, next)));
-    },
+    adjustQuantity,
+    setQuantityTo,
     maxQuantity: MAX_QUANTITY,
     stage,
     paymentMethodId,
-    setPaymentMethodId: (id: PaymentMethodId) => {
-      setBalanceError(null);
-      setPaymentMethodId(id);
-    },
+    setPaymentMethodId: selectPaymentMethod,
     affordability,
     order,
     pulls,
@@ -197,18 +210,14 @@ export function usePullSession(slug: string) {
     swapResult,
     isSwapping: assaying,
     isSettling: stage === "settling",
-    swappingPullIds: assayingPulls.map((pull) => pull.id),
-    startReview: () => setStage("reviewing"),
-    cancelReview: () => setStage("browsing"),
-    confirmPurchase: () =>
-      purchase.mutate({ slug, quantity, paymentMethodId }),
+    swappingPullIds,
+    startReview,
+    cancelReview,
+    confirmPurchase,
     finishReveal,
     togglePull,
     toggleAll,
-    swapPulls: (chosen: Pull[]) => {
-      if (!order) return;
-      swap.mutate({ pulls: chosen, expiresAt: order.expiresAt });
-    },
+    swapPulls: swapChosenPulls,
     dismissSwap,
     reset,
   };

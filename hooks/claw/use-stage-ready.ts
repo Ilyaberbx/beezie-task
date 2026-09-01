@@ -1,27 +1,14 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { createBooleanStore } from "@/lib/ui/store";
 
-let ready = false;
-const listeners = new Set<() => void>();
+const stageReady = createBooleanStore();
 
-function subscribe(listener: () => void) {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
-
-const getSnapshot = () => ready;
-const getServerSnapshot = () => false;
-
-/** The idle machine video can play — the page has everything it was waiting on. */
 export function markStageReady() {
-  if (ready) return;
-  ready = true;
-  for (const listener of listeners) listener();
+  stageReady.set(true);
 }
 
 export function useStageReady() {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return useSyncExternalStore(stageReady.subscribe, stageReady.get, stageReady.getServer);
 }

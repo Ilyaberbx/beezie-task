@@ -1,5 +1,3 @@
-"use client";
-
 import { Dialog } from "@/components/ui/dialog";
 import { currency } from "@/lib/format";
 import type { SwapResult } from "@/lib/claw/types";
@@ -37,7 +35,9 @@ export function SwapSuccessDialog({
   );
 }
 
-/** Lucide's Check, split at the elbow so each leg can draw in turn. */
+const TICK_SHORT_LEG = "M4 12 9 17";
+const TICK_LONG_LEG = "M9 17 20 6";
+
 function TickIcon() {
   return (
     <svg
@@ -54,8 +54,8 @@ function TickIcon() {
         className="animate-tick-settle"
         style={{ transformBox: "fill-box", transformOrigin: "center" }}
       >
-        <path d="M4 12 9 17" strokeDasharray="8" className="animate-tick-a" />
-        <path d="M9 17 20 6" strokeDasharray="16" className="animate-tick-b" />
+        <path d={TICK_SHORT_LEG} strokeDasharray="8" className="animate-tick-a" />
+        <path d={TICK_LONG_LEG} strokeDasharray="16" className="animate-tick-b" />
       </g>
     </svg>
   );

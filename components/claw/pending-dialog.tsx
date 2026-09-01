@@ -1,10 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import { currency } from "@/lib/format";
 import { Dialog } from "@/components/ui/dialog";
+import { useRotatingIndex } from "@/hooks/use-rotating-index";
 import type { Collectible } from "@/lib/claw/types";
 
 const ROTATION_MS = 1100;
@@ -16,16 +16,7 @@ export function PendingDialog({
   open: boolean;
   previews: Collectible[];
 }) {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (!open || previews.length === 0) return;
-    const timer = window.setInterval(
-      () => setIndex((current) => (current + 1) % previews.length),
-      ROTATION_MS,
-    );
-    return () => window.clearInterval(timer);
-  }, [open, previews.length]);
+  const index = useRotatingIndex(previews.length, ROTATION_MS, open);
 
   const preview = previews[index];
   if (!preview) return null;

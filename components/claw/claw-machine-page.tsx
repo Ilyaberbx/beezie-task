@@ -4,10 +4,11 @@ import { SiteHeader } from "@/components/claw/site-header";
 import { MachineStage } from "@/components/claw/machine-stage";
 import { PageGate } from "@/components/claw/page-gate";
 import { ClawExperience } from "@/components/claw/claw-experience";
+import { PromoField } from "@/components/claw/promo-field";
 import { OddsGrid } from "@/components/claw/odds-grid";
 import { MoreMachines } from "@/components/claw/more-machines";
 import { TopItems } from "@/components/claw/top-items";
-import { RecentPulls } from "@/components/claw/recent-pulls";
+import { RecentPullsSection } from "@/components/claw/recent-pulls";
 import { Separator } from "@/components/ui/separator";
 import { clawQueries, fetchRecentPulls, fetchTopItems } from "@/lib/claw/queries";
 import { findMachine } from "@/lib/claw/mock";
@@ -63,6 +64,7 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
               </p>
 
               <ClawExperience slug={slug} />
+              <PromoField className="max-md:mt-1" />
             </div>
 
             <Separator />
@@ -77,7 +79,7 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
             <TopItems items={topItems} />
           </div>
           <div className="flex animate-rise-in min-h-0 flex-col [animation-delay:870ms]">
-            <RecentPulls pulls={recentPulls} />
+            <RecentPullsSection pulls={recentPulls} />
           </div>
         </div>
       </main>

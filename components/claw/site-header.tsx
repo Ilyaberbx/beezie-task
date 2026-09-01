@@ -3,7 +3,7 @@ import Link from "next/link";
 import { asset } from "@/lib/asset";
 import { cn } from "@/lib/cn";
 import { DEFAULT_MACHINE_SLUG } from "@/lib/claw/mock";
-import { WalletBalance } from "./wallet-balance";
+import { WalletAmount } from "./wallet-balance";
 
 const CLAW_HREF = `/claw/${DEFAULT_MACHINE_SLUG}`;
 
@@ -74,7 +74,16 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-6">
-          <WalletBalance />
+          <span className="hidden h-10 items-center gap-2.5 rounded-[7px] bg-card px-4 text-sm font-medium sm:flex">
+            <Image
+              src={asset("/media/icons/wallet.svg")}
+              alt=""
+              width={16}
+              height={13}
+              className="h-[13px] w-4"
+            />
+            <WalletAmount />
+          </span>
           <Image
             src={asset("/media/avatar.webp")}
             alt="Your profile"
