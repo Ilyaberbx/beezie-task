@@ -31,7 +31,7 @@ export function RevealSingle({
 
   return (
     <Dialog open={open} onClose={onKeep} label="Your pull" variant="fullscreen">
-      <div className="relative flex h-full flex-col overflow-y-auto">
+      <div className="relative flex h-full flex-col scroll-y overscroll-contain">
         <div className="relative grid flex-1 content-center-safe gap-6 p-4 pt-12 md:grid-cols-2 md:content-center md:items-center md:gap-12 md:p-12">
           <div
             className={cn(

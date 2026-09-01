@@ -27,7 +27,7 @@ type DialogProps = {
 };
 
 const CONTENT_SIZED = new Set(["center", "sheet"]);
-const SCROLLS_ITS_OWN_CONTENT = "overflow-y-auto overscroll-contain";
+const SCROLLS_ITS_OWN_CONTENT = "scroll-y overscroll-contain";
 
 const PANELS = {
   center: `max-h-[calc(100svh-32px)] ${SCROLLS_ITS_OWN_CONTENT} m-auto w-[calc(100vw-32px)] max-w-[608px] rounded-[12px] border border-border-strong bg-card not-data-[closing]:open:animate-dialog-in data-[closing]:animate-dialog-out`,

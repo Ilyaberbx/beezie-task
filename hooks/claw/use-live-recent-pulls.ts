@@ -7,7 +7,6 @@ import { drawRecentPull } from "@/lib/claw/mock";
 import { insertLivePull, settleLivePull, trimLivePulls } from "@/lib/claw/live-pulls";
 import {
   livePullsStore,
-  pullArrivalsStore,
   seedLivePulls,
   updateLivePulls,
 } from "@/lib/claw/live-pulls-store";
@@ -39,7 +38,6 @@ export function useLiveRecentPulls(
 
     const receive = (pull: RecentPull) => {
       updateLivePulls((list) => insertLivePull(list, pull));
-      pullArrivalsStore.increment();
 
       const trim = setTimeout(() => {
         timers.delete(trim);
@@ -83,10 +81,3 @@ export function useLiveRecentPulls(
   );
 }
 
-export function usePullArrivals() {
-  return useSyncExternalStore(
-    pullArrivalsStore.subscribe,
-    pullArrivalsStore.get,
-    pullArrivalsStore.getServer,
-  );
-}

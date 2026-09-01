@@ -1,4 +1,3 @@
-import { createCounterStore } from "../ui/store.ts";
 import { seedLivePullWindow, type LivePull } from "./live-pulls.ts";
 import type { RecentPull } from "./types";
 
@@ -18,8 +17,6 @@ export const livePullsStore = {
   get: () => pulls,
   getServer: () => pulls,
 };
-
-export const pullArrivalsStore = createCounterStore();
 
 export function seedLivePulls(initial: RecentPull[]) {
   if (seeded) return;

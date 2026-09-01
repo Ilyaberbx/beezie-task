@@ -74,7 +74,7 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
           </div>
         </div>
 
-        <div className="grid min-h-0 gap-4 max-md:grid-rows-[repeat(2,minmax(0,min(600px,72svh)))] md:h-[min(800px,82svh)] md:grid-cols-2 md:gap-6">
+        <div className="grid min-h-0 gap-4 md:h-[min(800px,82svh)] md:grid-cols-2 md:gap-6">
           <div className="flex animate-rise-in min-h-0 flex-col [animation-delay:810ms]">
             <TopItems items={topItems} />
           </div>

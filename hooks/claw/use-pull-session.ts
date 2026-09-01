@@ -85,14 +85,11 @@ export function usePullSession(slug: string) {
   useEffect(() => {
     if (stage !== "settling") return;
     const assayFinale = window.setTimeout(() => {
-      const swapped = swapVariables?.pulls.map((pull) => pull.id) ?? [];
-      setSwappedPullIds((current) => [...current, ...swapped]);
-      setSelectedPullIds((current) => current.filter((id) => !swapped.includes(id)));
       setStage("swapped");
       refreshFunds();
     }, ASSAY_FINALE_MS);
     return () => window.clearTimeout(assayFinale);
-  }, [stage, swapVariables, refreshFunds]);
+  }, [stage, refreshFunds]);
 
   const assaying = isAssayingStage(stage);
 
@@ -123,13 +120,19 @@ export function usePullSession(slug: string) {
     purchase.reset();
   }, [purchase, swap]);
 
+  // The grid only loses the swapped cards on the way back in. Retiring them at the
+  // finale reflows the list under a dialog that is still fading out.
   const dismissSwap = useCallback(() => {
-    if (remainingPulls.length === 0) {
+    const swapped = swapVariables?.pulls.map((pull) => pull.id) ?? [];
+    const survivors = remainingPulls.filter((pull) => !swapped.includes(pull.id));
+    setSwappedPullIds((current) => [...current, ...swapped]);
+    setSelectedPullIds((current) => current.filter((id) => !swapped.includes(id)));
+    if (survivors.length === 0) {
       reset();
       return;
     }
     setStage("revealed");
-  }, [remainingPulls.length, reset]);
+  }, [remainingPulls, swapVariables, reset]);
 
   const affordability = useMemo(
     () =>
@@ -209,7 +212,7 @@ export function usePullSession(slug: string) {
     selectedValue,
     swapResult,
     isSwapping: assaying,
-    isSettling: stage === "settling",
+    isSettling: stage === "settling" || stage === "swapped",
     swappingPullIds,
     startReview,
     cancelReview,
