@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -50,10 +51,44 @@ function setWaiting(delta: number) {
   for (const listener of listeners) listener();
 }
 
+type Morph = { animation: Animation; overflow: string; pinned: HTMLElement[] };
+type MorphRef = { current: Morph | null };
+
+/** Put the panel back on its own feet: no animated box, no pinned content. */
+function stopMorph(el: HTMLElement, run: MorphRef) {
+  const active = run.current;
+  if (!active) return;
+  run.current = null;
+  active.animation.cancel();
+  el.style.overflow = active.overflow;
+  el.style.width = "";
+  el.style.maxWidth = "";
+  el.style.height = "";
+  for (const child of active.pinned) child.style.width = "";
+}
+
 /** Grow or shrink the panel between two boxes, clipping its content meanwhile. */
-function morphBox(el: HTMLElement, from: Box, to: Box) {
-  const previousOverflow = el.style.overflow;
+function morphBox(el: HTMLElement, run: MorphRef, from: Box, to: Box) {
+  // One morph at a time — a second one layered on top would snapshot the first
+  // one's clipped overflow as the panel's own and never give the scroll back.
+  stopMorph(el, run);
+  const overflow = el.style.overflow;
   el.style.overflow = "hidden";
+
+  // A travelling width re-wraps every line of content on every frame, which is
+  // the stutter. Hold the content at the width it ends on and slide the box
+  // over it instead; the panel is cross-fading its contents anyway.
+  const pinned: HTMLElement[] = [];
+  if (Math.abs(to.w - from.w) > 1) {
+    const inner = el.clientWidth;
+    for (const child of Array.from(el.children)) {
+      if (!(child instanceof HTMLElement)) continue;
+      if (getComputedStyle(child).position === "absolute") continue;
+      child.style.width = `${inner}px`;
+      pinned.push(child);
+    }
+  }
+
   // max-width is what actually sizes these panels, so it has to travel too —
   // animating width alone just gets clamped back to the incoming panel's cap.
   const animation = el.animate(
@@ -63,14 +98,34 @@ function morphBox(el: HTMLElement, from: Box, to: Box) {
     ],
     { duration: MORPH_MS, easing: MORPH_EASE },
   );
+  run.current = { animation, overflow, pinned };
   const restore = () => {
-    el.style.overflow = previousOverflow;
+    if (run.current?.animation === animation) stopMorph(el, run);
   };
   animation.finished.then(restore, restore);
   return animation;
 }
 
 const measure = (el: HTMLElement): Box => ({ w: el.offsetWidth, h: el.offsetHeight });
+
+/** When the viewport last moved. A panel sized off the viewport has to follow it
+    instantly — animating that just makes the panel lag the window. */
+let viewportAt = 0;
+if (typeof window !== "undefined") {
+  window.addEventListener(
+    "resize",
+    () => {
+      viewportAt = performance.now();
+    },
+    { passive: true },
+  );
+}
+
+/* Showing the panel and starting its morph has to happen in the same frame the
+   panel appears in. A passive effect is free to land after that frame is
+   painted, which is a flash of the panel at its own size before the morph
+   yanks it back — and only sometimes, whenever the commit slips a frame. */
+const useBeforePaint = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 function publish(id: symbol, phase: DialogPhase | null) {
   if (phase === null) {
@@ -155,7 +210,7 @@ export function Dialog({
   const [closing, setClosing] = useState(false);
   const reduceMotion = usePrefersReducedMotion();
   const box = useRef<Box | null>(null);
-  const morphing = useRef(false);
+  const morph = useRef<Morph | null>(null);
 
   useSyncExternalStore(subscribe, getVersion, serverVersion);
   const queued = useSyncExternalStore(subscribe, getWaiting, serverVersion);
@@ -167,7 +222,7 @@ export function Dialog({
     onOpenedRef.current = onOpened;
   });
 
-  useEffect(() => {
+  useBeforePaint(() => {
     const dialog = ref.current;
     if (!dialog) return;
     if (open && !dialog.open && !hasOther) {
@@ -189,12 +244,10 @@ export function Dialog({
       if (continues && from) {
         // The entrance keyframes would fight the morph over the same box.
         for (const animation of dialog.getAnimations()) animation.cancel();
-        morphing.current = true;
         const settle = () => {
-          morphing.current = false;
           box.current = measure(dialog);
         };
-        morphBox(dialog, from, to).finished.then(settle, settle);
+        morphBox(dialog, morph, from, to).finished.then(settle, settle);
         // The shell carries over; its contents are what actually changed.
         for (const child of Array.from(dialog.children)) {
           child.animate([{ opacity: 0 }, { opacity: 1 }], {
@@ -226,7 +279,12 @@ export function Dialog({
     const timer = window.setTimeout(
       () => {
         const dialog = ref.current;
-        if (dialog && handover) {
+        if (dialog && morphable) {
+          // Always leave the box behind, not only when something has already
+          // announced itself: a dialog still loading its chunk announces late
+          // and would otherwise get a plain entrance where a warm one morphs.
+          // Stop any morph first, or the box handed on is a half-animated one.
+          stopMorph(dialog, morph);
           handoff = { ...measure(dialog), at: performance.now() };
         }
         dialog?.close();
@@ -244,20 +302,22 @@ export function Dialog({
     if (!dialog || !open || closing || !morphable) return;
 
     const observer = new ResizeObserver(() => {
-      if (morphing.current) return;
+      if (morph.current) return;
       const from = box.current;
       const to = measure(dialog);
       box.current = to;
       if (!from || (Math.abs(to.w - from.w) < 2 && Math.abs(to.h - from.h) < 2)) return;
-      morphing.current = true;
+      if (performance.now() - viewportAt < 300) return;
       const settle = () => {
-        morphing.current = false;
         box.current = measure(dialog);
       };
-      morphBox(dialog, from, to).finished.then(settle, settle);
+      morphBox(dialog, morph, from, to).finished.then(settle, settle);
     });
     observer.observe(dialog);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      stopMorph(dialog, morph);
+    };
   }, [open, closing, morphable]);
 
   useEffect(() => () => publish(id, null), [id]);

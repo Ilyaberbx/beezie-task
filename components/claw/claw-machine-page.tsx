@@ -34,7 +34,7 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
 
       <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-2 md:gap-6 md:px-[50px] md:pb-12 md:pt-7">
         <div className="grid gap-4 md:grid-cols-2 md:gap-6">
-          <div className="animate-stage-in [animation-delay:640ms]">
+          <div className="animate-stage-in md:h-full [animation-delay:640ms]">
             <MachineStage
               name={machine.name}
               video={machine.idleVideo}

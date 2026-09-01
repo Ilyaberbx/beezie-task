@@ -50,15 +50,19 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
     markStageReady();
   }
 
+  // Stacked, the stage is a square. Beside the card it is the card's twin: the
+  // grid row is sized by the card, so the stage just fills the row it shares.
   return (
     <div
-      className="relative mx-auto aspect-square w-full max-h-[72svh] max-w-[72svh] overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-panel md:rounded-panel"
+      className="relative mx-auto aspect-square w-full max-h-[72svh] max-w-[72svh] overflow-hidden rounded-[15px] bg-card bg-cover bg-center shadow-panel md:aspect-auto md:h-full md:max-h-none md:max-w-none md:rounded-panel"
       style={{ backgroundImage: `url(${poster})` }}
     >
       <video
         ref={videoRef}
         className={cn(
-          "size-full object-cover transition-opacity duration-700 ease-out",
+          // Out of flow, so the stage takes its height from the row rather than
+          // from the video's own 1080 lines.
+          "absolute inset-0 size-full object-cover transition-opacity duration-700 ease-out",
           ready ? "opacity-100" : "opacity-0",
         )}
         poster={poster}
