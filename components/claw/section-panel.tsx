@@ -11,11 +11,20 @@ export function SectionPanel({
   className?: string;
 }) {
   return (
-    <section className="flex flex-1 flex-col rounded-xl border border-border bg-card py-4 shadow-panel md:rounded-panel md:py-8">
+    <section className="flex min-h-0 flex-1 flex-col rounded-xl border border-border bg-card py-4 shadow-panel md:rounded-panel md:py-8">
       <h2 className="px-4 text-center text-lg font-semibold leading-7 text-white md:px-5 md:text-2xl md:leading-8">
         {title}
       </h2>
-      <div className={cn("@container mt-4 flex-1 px-4 md:mt-6 md:px-5", className)}>
+      <div
+        tabIndex={0}
+        role="group"
+        aria-label={title}
+        className={cn(
+          "@container mt-4 min-h-0 flex-1 px-4 focus-visible:outline-offset-[-2px]",
+          "scroll-y overscroll-contain md:mt-6 md:px-5",
+          className,
+        )}
+      >
         {children}
       </div>
     </section>

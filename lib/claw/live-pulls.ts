@@ -1,6 +1,6 @@
 import type { RecentPull } from "./types";
 
-export const PULL_WINDOW = 6;
+export const PULL_WINDOW = 10;
 
 export type LivePull = RecentPull & { isLive: boolean };
 

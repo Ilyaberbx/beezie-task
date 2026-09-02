@@ -87,13 +87,24 @@ export const TOP_ITEMS: TopItem[] = COLLECTIBLES.slice(0, 12).map((collectible) 
   rarity: collectible.rarity,
 }));
 
-const OWNERS = ["lebnani", "0xhoneycomb", "vaultrat", "grailhunter", "slabqueen", "mintcondition"];
+const OWNERS = [
+  "lebnani",
+  "0xhoneycomb",
+  "vaultrat",
+  "grailhunter",
+  "slabqueen",
+  "mintcondition",
+  "holofoiled",
+  "gemrated",
+  "0xpackrat",
+  "sleevedup",
+];
 
-export const RECENT_PULLS: RecentPull[] = COLLECTIBLES.slice(2, 8).map((collectible, index) => ({
+export const RECENT_PULLS: RecentPull[] = COLLECTIBLES.slice(2, 12).map((collectible, index) => ({
   id: `${collectible.id}-recent`,
   title: collectible.title,
   image: collectible.image,
-  owner: OWNERS[index],
+  owner: OWNERS[index % OWNERS.length],
   price: collectible.swapValue,
 }));
 
