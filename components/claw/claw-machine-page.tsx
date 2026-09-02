@@ -3,6 +3,7 @@ import { HydrationBoundary, QueryClient, dehydrate } from "@tanstack/react-query
 import { SiteHeader } from "@/components/claw/site-header";
 import { MachineStage } from "@/components/claw/machine-stage";
 import { PageGate } from "@/components/claw/page-gate";
+import { ViewportProbe } from "@/components/claw/viewport-probe";
 import { ClawExperience } from "@/components/claw/claw-experience";
 import { PromoField } from "@/components/claw/promo-field";
 import { OddsGrid } from "@/components/claw/odds-grid";
@@ -31,6 +32,7 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <PageGate />
+      <ViewportProbe />
       <SiteHeader />
 
       <main className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-2 md:gap-6 md:px-8 md:pb-12 md:pt-7 lg:px-[50px]">
