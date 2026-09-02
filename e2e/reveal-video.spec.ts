@@ -31,6 +31,25 @@ test("the reveal video plays and hands over to the result", async ({ page }) => 
   });
 });
 
+test("skipping the reveal hands straight over to the result", async ({ page }) => {
+  test.slow();
+
+  await page.goto("/claw/pokemon-gold/");
+  await page.getByRole("button", { name: "Start Now" }).click();
+
+  const review = page.getByRole("dialog", { name: "Review and pay" });
+  await expect(review).toBeVisible();
+  await review.getByRole("button", { name: "Confirm" }).click();
+
+  const reveal = page.getByRole("dialog", { name: "Revealing your pull" });
+  await expect(reveal).toBeVisible({ timeout: 30_000 });
+  await reveal.getByRole("button", { name: "Skip" }).click();
+
+  await expect(page.getByRole("dialog", { name: "Your pull", exact: true })).toBeVisible({
+    timeout: 10_000,
+  });
+});
+
 test("every handoff between dialogs keeps a panel on screen", async ({ page }) => {
   test.slow();
 

@@ -326,6 +326,9 @@
 @utility pb-safe-* {
   padding-bottom: max(calc(--value(integer) * 1px), env(safe-area-inset-bottom));
 }
+@utility bottom-safe-* {
+  bottom: max(calc(--value(integer) * 1px), env(safe-area-inset-bottom));
+}
 @utility pl-safe-* {
   padding-left: max(calc(--value(integer) * 1px), env(safe-area-inset-left));
 }

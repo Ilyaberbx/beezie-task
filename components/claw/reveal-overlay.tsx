@@ -103,6 +103,14 @@ export function RevealOverlay({
       >
         {soundOn ? <Volume2 className="size-4.5" /> : <VolumeX className="size-4.5" />}
       </button>
+
+      <button
+        type="button"
+        onClick={onFinish}
+        className="absolute bottom-safe-16 right-4 z-10 grid h-9 place-items-center rounded-md bg-black/50 px-4 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-black/65"
+      >
+        Skip
+      </button>
     </Dialog>
   );
 }
