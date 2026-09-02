@@ -21,7 +21,7 @@ export function SectionPanel({
         aria-label={title}
         className={cn(
           "@container mt-4 min-h-0 flex-1 px-4 focus-visible:outline-offset-[-2px]",
-          "scroll-y overscroll-contain md:mt-6 md:px-5",
+          "scroll-y md:mt-6 md:px-5",
           className,
         )}
       >

@@ -75,10 +75,10 @@ export async function ClawMachinePage({ slug }: { slug: string }) {
         </div>
 
         <div className="grid min-h-0 gap-4 md:h-[min(800px,82svh)] md:grid-cols-2 md:gap-6">
-          <div className="flex max-md:h-[82svh] animate-rise-in min-h-0 flex-col [animation-delay:810ms]">
+          <div className="flex max-md:h-[60svh] animate-rise-in min-h-0 flex-col [animation-delay:810ms]">
             <TopItems items={topItems} />
           </div>
-          <div className="flex max-md:h-[82svh] animate-rise-in min-h-0 flex-col [animation-delay:870ms]">
+          <div className="flex max-md:h-[60svh] animate-rise-in min-h-0 flex-col [animation-delay:870ms]">
             <RecentPullsSection pulls={recentPulls} />
           </div>
         </div>
