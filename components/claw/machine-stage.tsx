@@ -67,13 +67,13 @@ export function MachineStage({ name, video, poster }: MachineStageProps) {
           active={soundOn}
           onClick={() => setSoundOn(!soundOn)}
           icon={soundOn ? <Volume2 className="size-3.5" /> : <VolumeX className="size-3.5" />}
-          label={soundOn ? "Sound on" : "Sound off"}
+          label="Sound"
         />
         <StageToggle
           active={animationOn}
           onClick={() => setAnimationOn((current) => !current)}
           icon={<Sparkles className="size-3.5" />}
-          label={animationOn ? "Animation on" : "Animation off"}
+          label="Animation"
         />
       </div>
     </div>
@@ -104,6 +104,7 @@ function StageToggle({
     >
       {icon}
       {label}
+      <span className="-ml-1 inline-block w-5 text-left">{active ? "on" : "off"}</span>
     </button>
   );
 }

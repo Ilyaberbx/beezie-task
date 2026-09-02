@@ -27,6 +27,25 @@ test("the stage toggles report their state", async ({ page }) => {
   );
 });
 
+test("the stage toggles keep their footprint when their state flips", async ({ page }) => {
+  const sound = page.getByRole("button", { name: /^Sound o/ });
+  const animation = page.getByRole("button", { name: /^Animation o/ });
+
+  const span = async () => {
+    const [a, b] = [await sound.boundingBox(), await animation.boundingBox()];
+    return { x: a!.x, width: a!.width, animationX: b!.x, animationWidth: b!.width };
+  };
+
+  const before = await span();
+
+  await sound.click();
+  await expect(sound).toHaveAttribute("aria-pressed", "true");
+  await animation.click();
+  await expect(animation).toHaveAttribute("aria-pressed", "false");
+
+  expect(await span()).toEqual(before);
+});
+
 test("the idle machine video pauses behind a dialog and resumes after it", async ({ page }) => {
   await expect.poll(() => isPaused(page), { timeout: 20_000 }).toBe(false);
 
