@@ -56,7 +56,7 @@ export function ClawExperience({ slug }: { slug: string }) {
   );
 
   const viewportPinnedPurchaseBar = (
-    <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border/60 bg-background pb-safe-16 pl-safe-16 pr-safe-16 pt-4 md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border/60 bg-background pb-safe-16 pl-safe-16 pr-safe-16 pt-4 after:absolute after:inset-x-0 after:top-full after:h-60 after:bg-background after:content-[''] md:hidden">
       {purchaseControls}
     </div>
   );

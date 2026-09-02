@@ -223,26 +223,6 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  body::before,
-  body::after {
-    content: "";
-    position: fixed;
-    inset-inline: 0;
-    z-index: 40;
-    pointer-events: none;
-    background: var(--color-background);
-  }
-
-  body::before {
-    top: 0;
-    height: env(safe-area-inset-top);
-  }
-
-  body::after {
-    bottom: 0;
-    height: env(safe-area-inset-bottom);
-  }
-
   button:not(:disabled),
   summary,
   [role="button"]:not([aria-disabled="true"]) {
